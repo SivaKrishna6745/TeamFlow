@@ -2,6 +2,9 @@ import React from 'react';
 import Filters from './Filters';
 import Button from './Button';
 import TaskCard from './TaskCard';
+import { tasksData } from '../../mockData';
+
+export const STATUSES = ['Todo', 'In Progress', 'Done'] as const;
 
 const TaskBoard = () => {
     return (
@@ -15,18 +18,16 @@ const TaskBoard = () => {
             </div>
             <Filters />
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div className="border border-slate-400 rounded-md p-2">
-                    <h2 className="text-xl font-bold uppercase text-center mb-4">Todo</h2>
-                    <TaskCard />
-                </div>
-                <div className="border border-slate-400 rounded-md p-2">
-                    <h2 className="text-xl font-bold uppercase text-center mb-4">In progress</h2>
-                    <TaskCard />
-                </div>
-                <div className="border border-slate-400 rounded-md p-2">
-                    <h2 className="text-xl font-bold uppercase text-center mb-4">Done</h2>
-                    <TaskCard />
-                </div>
+                {STATUSES.map((status) => (
+                    <div className="border border-slate-400 rounded-md p-2" key={status}>
+                        <h2 className="text-xl font-bold uppercase text-center mb-4">{status}</h2>
+                        {tasksData
+                            .filter((task) => task.status === status)
+                            .map((task) => (
+                                <TaskCard key={task.id} task={task} />
+                            ))}
+                    </div>
+                ))}
             </div>
         </div>
     );
