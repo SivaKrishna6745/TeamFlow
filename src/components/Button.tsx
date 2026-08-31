@@ -1,14 +1,15 @@
 import React from 'react';
 
 type ButtonProps = {
+    type?: React.ButtonHTMLAttributes<HTMLButtonElement>['type'];
     className?: string;
     label: string;
     onClick?: () => void;
 };
 
-const Button = ({ className, label, onClick }: ButtonProps) => {
+const Button = ({ type = 'button', className, label, onClick }: ButtonProps) => {
     return (
-        <button className={`cursor-pointer ${className}`} onClick={onClick}>
+        <button type={type} className={`cursor-pointer ${className}`} onClick={onClick}>
             {label}
         </button>
     );
