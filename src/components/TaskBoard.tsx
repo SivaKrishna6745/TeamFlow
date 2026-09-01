@@ -6,13 +6,17 @@ import Button from './Button';
 import TaskCard from './TaskCard';
 import { tasksData } from '../../mockData';
 import TaskForm from './TaskForm';
-import { Task } from '@/types';
+import { FormMode, Status, Task } from '@/types';
 
 export const STATUSES = ['Todo', 'In Progress', 'Done'] as const;
+
+export const FORM_MODES = ['New', 'Edit'] as const;
 
 const TaskBoard = () => {
     const [isFormOpen, setIsFormOpen] = useState<boolean>(false);
     const [tasks, setTasks] = useState<Task[]>(tasksData);
+    const [formMode, setFormMode] = useState<FormMode>('New');
+    const [editingTask, setEditingTask] = useState<Task | undefined>(undefined);
 
     const openForm = () => {
         setIsFormOpen(true);
@@ -24,6 +28,23 @@ const TaskBoard = () => {
 
     const addTask = (task: Task) => {
         setTasks((prevTasks) => [...prevTasks, task]);
+    };
+
+    const editTask = (id: string) => {
+        setIsFormOpen(true);
+        setFormMode('Edit');
+        const task = tasks.find((t) => t.id === id);
+        setEditingTask(task);
+    };
+
+    const updateTask = (id: string, changes: { desc?: string; status?: Status }) => {
+        setTasks((prevTasks) =>
+            prevTasks.map((t) =>
+                t.id === id ? { ...t, desc: changes.desc ?? t.desc, status: changes.status ?? t.status } : t,
+            ),
+        );
+        setEditingTask(undefined);
+        setFormMode('New');
     };
 
     return (
@@ -38,7 +59,14 @@ const TaskBoard = () => {
             </div>
             {isFormOpen && (
                 <div className="fixed inset-0 bg-[rgba(0,0,0,0.9)] z-50 flex items-center justify-center">
-                    <TaskForm tasks={tasks} close={closeForm} add={addTask} />
+                    <TaskForm
+                        tasks={tasks}
+                        close={closeForm}
+                        add={addTask}
+                        mode={formMode}
+                        editingTask={editingTask}
+                        update={updateTask}
+                    />
                 </div>
             )}
             <Filters />
@@ -49,7 +77,7 @@ const TaskBoard = () => {
                         {tasks
                             .filter((task) => task.status === status)
                             .map((task) => (
-                                <TaskCard key={task.id} task={task} />
+                                <TaskCard key={task.id} task={task} edit={editTask} />
                             ))}
                     </div>
                 ))}

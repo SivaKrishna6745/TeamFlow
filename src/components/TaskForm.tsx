@@ -3,21 +3,25 @@
 import React, { useState } from 'react';
 import { STATUSES } from './TaskBoard';
 import Button from './Button';
-import { Status, Task } from '@/types';
-import { tasksData } from '../../mockData';
+import { FormMode, Status, Task } from '@/types';
 
 interface TaskFormProps {
     tasks: Task[];
     close: () => void;
     add: (task: Task) => void;
+    mode?: FormMode;
+    editingTask: Task | undefined;
+    update?: (id: string, changes: { desc?: string; status?: Status }) => void;
 }
 
-const TaskForm = ({ tasks, close, add }: TaskFormProps) => {
-    const [desc, setDesc] = useState<string>('');
-    const [status, setStatus] = useState<Status>('Todo');
+const TaskForm = ({ tasks, close, add, mode = 'New', editingTask = undefined, update }: TaskFormProps) => {
+    const editMode = mode === 'Edit';
+
+    const [desc, setDesc] = useState<string>(editMode ? (editingTask?.desc ?? '') : '');
+    const [status, setStatus] = useState<Status>(editMode ? (editingTask?.status ?? 'Todo') : 'Todo');
     const [error, setError] = useState<string>('');
 
-    const addATask = (e: React.FormEvent<HTMLFormElement>) => {
+    const submitTask = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
         if (desc.trim() === '') {
@@ -25,7 +29,12 @@ const TaskForm = ({ tasks, close, add }: TaskFormProps) => {
             return;
         }
 
-        if (tasks.some((task) => task.desc === desc)) {
+        if (!editMode && tasks.some((task) => task.desc.trim() === desc.trim())) {
+            setError('Task already exists!');
+            return;
+        }
+
+        if (editMode && tasks.some((t) => t.id !== editingTask?.id && t.desc.trim() === desc.trim())) {
             setError('Task already exists!');
             return;
         }
@@ -37,7 +46,9 @@ const TaskForm = ({ tasks, close, add }: TaskFormProps) => {
             createdAt: new Date().toISOString(),
         };
 
-        add(newTask);
+        if (editMode && editingTask) update?.(editingTask.id, { desc, status });
+        else add(newTask);
+
         setDesc('');
         setStatus('Todo');
         setError('');
@@ -47,10 +58,12 @@ const TaskForm = ({ tasks, close, add }: TaskFormProps) => {
     return (
         <form
             className="w-full max-w-md bg-zinc-900 text-white border border-zinc-700 rounded-lg p-6 flex flex-col gap-4 shadow-xl relative"
-            onSubmit={addATask}
+            onSubmit={submitTask}
         >
             <Button className="absolute top-3 right-3 text-zinc-400 hover:text-white" label="X" onClick={close} />
-            <h2 className="text-center text-2xl uppercase font-bold tracking-wide">New Task</h2>
+            <h2 className="text-center text-2xl uppercase font-bold tracking-wide">
+                {editMode ? 'Edit Task' : 'New Task'}
+            </h2>
             <textarea
                 name="desc"
                 placeholder="Description of the task..."

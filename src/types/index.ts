@@ -1,6 +1,8 @@
-import { STATUSES } from '@/components/TaskBoard';
+import { FORM_MODES, STATUSES } from '@/components/TaskBoard';
 
 export type Status = (typeof STATUSES)[number];
+
+export type FormMode = (typeof FORM_MODES)[number];
 
 export interface Task {
     id: string;
