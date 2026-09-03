@@ -6,7 +6,8 @@ export type FormMode = (typeof FORM_MODES)[number];
 
 export interface Task {
     id: string;
-    desc: string;
+    title: string;
+    description: string;
     status: Status;
     createdAt: string;
 }

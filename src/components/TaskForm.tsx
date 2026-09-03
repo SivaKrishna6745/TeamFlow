@@ -11,45 +11,59 @@ interface TaskFormProps {
     add: (task: Task) => void;
     mode?: FormMode;
     editingTask: Task | undefined;
-    update?: (id: string, changes: { desc?: string; status?: Status }) => void;
+    update?: (id: string, changes: { title?: string; description?: string; status?: Status }) => void;
 }
 
 const TaskForm = ({ tasks, close, add, mode = 'New', editingTask = undefined, update }: TaskFormProps) => {
     const editMode = mode === 'Edit';
 
-    const [desc, setDesc] = useState<string>(editMode ? (editingTask?.desc ?? '') : '');
+    const [title, setTitle] = useState<string>(editMode ? (editingTask?.title ?? '') : '');
+    const [description, setDescription] = useState<string>(editMode ? (editingTask?.description ?? '') : '');
     const [status, setStatus] = useState<Status>(editMode ? (editingTask?.status ?? 'Todo') : 'Todo');
     const [error, setError] = useState<string>('');
 
     const submitTask = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
-        if (desc.trim() === '') {
+        if (description.trim() === '') {
             setError('Please enter the task description');
             return;
         }
 
-        if (!editMode && tasks.some((task) => task.desc.trim() === desc.trim())) {
-            setError('Task already exists!');
+        if (
+            !editMode &&
+            tasks.some((task) => task.title.trim() === title.trim() && task.description.trim() === description.trim())
+        ) {
+            setError('A task with the same title and description already exists.');
             return;
         }
 
-        if (editMode && tasks.some((t) => t.id !== editingTask?.id && t.desc.trim() === desc.trim())) {
-            setError('Task already exists!');
+        if (
+            editMode &&
+            tasks.some(
+                (t) =>
+                    t.id !== editingTask?.id &&
+                    t.title.trim() === title.trim() &&
+                    t.description.trim() === description.trim(),
+            )
+        ) {
+            setError('A task with the same title and description already exists.');
             return;
         }
 
         const newTask = {
             id: crypto.randomUUID(),
-            desc,
+            title,
+            description,
             status,
             createdAt: new Date().toISOString(),
         };
 
-        if (editMode && editingTask) update?.(editingTask.id, { desc, status });
+        if (editMode && editingTask) update?.(editingTask.id, { title, description, status });
         else add(newTask);
 
-        setDesc('');
+        setTitle('');
+        setDescription('');
         setStatus('Todo');
         setError('');
         close();
@@ -64,14 +78,22 @@ const TaskForm = ({ tasks, close, add, mode = 'New', editingTask = undefined, up
             <h2 className="text-center text-2xl uppercase font-bold tracking-wide">
                 {editMode ? 'Edit Task' : 'New Task'}
             </h2>
+            <input
+                type="text"
+                name="title"
+                placeholder="title of the task..."
+                value={title}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setTitle(e.target.value)}
+                className="border border-stone-300 rounded-sm px-2 py-1"
+            />
             <textarea
-                name="desc"
-                placeholder="Description of the task..."
+                name="description"
+                placeholder="description of the task..."
                 rows={4}
                 cols={30}
-                value={desc}
+                value={description}
                 onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {
-                    setDesc(e.target.value);
+                    setDescription(e.target.value);
                     setError('');
                 }}
                 className="border border-stone-300 rounded-sm px-2 py-1"
