@@ -5,7 +5,7 @@ import Filters from './Filters';
 import Button from './Button';
 import { tasksData } from '../../mockData';
 import TaskForm from './TaskForm';
-import { FormMode, Status, Task } from '@/types';
+import { Filter, FormMode, Status, Task } from '@/types';
 import TaskColumn from './TaskColumn';
 
 export const STATUSES = ['Todo', 'In Progress', 'Done'] as const;
@@ -49,6 +49,7 @@ const TaskBoard = () => {
     const [confirmDel, setConfirmDel] = useState<string | undefined>(undefined);
     const [draggingId, setDraggingId] = useState<string | undefined>(undefined);
     const [toastMessage, setToastMessage] = useState<string | undefined>(undefined);
+    const [filter, setFilter] = useState<Filter>('All');
 
     const openForm = () => {
         setIsFormOpen(true);
@@ -116,6 +117,12 @@ const TaskBoard = () => {
         return () => clearTimeout(timer);
     }, [toastMessage]);
 
+    const selectFilter = (filter: Filter) => {
+        setFilter(filter);
+    };
+
+    const derivedTasks = filter === 'All' ? tasks : tasks.filter((t) => t.status === filter);
+
     return (
         <div className="relative flex flex-col gap-8 px-10">
             <div className="flex justify-between">
@@ -147,13 +154,13 @@ const TaskBoard = () => {
                     onCancel={() => setConfirmDel(undefined)}
                 />
             )}
-            <Filters />
+            <Filters selectedFilter={filter} select={selectFilter} />
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 {STATUSES.map((status) => (
                     <TaskColumn
                         key={status}
                         status={status}
-                        tasks={tasks.filter((t) => t.status === status)}
+                        tasks={derivedTasks.filter((t) => t.status === status)}
                         editTask={editTask}
                         deleteTask={deleteTask}
                         dragStart={handleDragStart}

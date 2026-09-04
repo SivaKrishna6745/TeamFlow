@@ -1,8 +1,11 @@
+import { FILTERS } from '@/components/Filters';
 import { FORM_MODES, STATUSES } from '@/components/TaskBoard';
 
 export type Status = (typeof STATUSES)[number];
 
 export type FormMode = (typeof FORM_MODES)[number];
+
+export type Filter = (typeof FILTERS)[number];
 
 export interface Task {
     id: string;
