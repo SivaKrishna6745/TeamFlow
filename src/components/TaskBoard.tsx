@@ -1,12 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Filters from './Filters';
 import Button from './Button';
-import TaskCard from './TaskCard';
 import { tasksData } from '../../mockData';
 import TaskForm from './TaskForm';
 import { FormMode, Status, Task } from '@/types';
+import TaskColumn from './TaskColumn';
 
 export const STATUSES = ['Todo', 'In Progress', 'Done'] as const;
 
@@ -47,6 +47,8 @@ const TaskBoard = () => {
     const [formMode, setFormMode] = useState<FormMode>('New');
     const [editingTask, setEditingTask] = useState<Task | undefined>(undefined);
     const [confirmDel, setConfirmDel] = useState<string | undefined>(undefined);
+    const [draggingId, setDraggingId] = useState<string | undefined>(undefined);
+    const [toastMessage, setToastMessage] = useState<string | undefined>(undefined);
 
     const openForm = () => {
         setIsFormOpen(true);
@@ -88,18 +90,44 @@ const TaskBoard = () => {
         setConfirmDel(id);
     };
 
+    const handleDragStart = (id: string) => {
+        setDraggingId(id);
+    };
+
+    const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+        e.preventDefault();
+    };
+
+    const handleDrop = (status: Status) => {
+        if (!draggingId) return;
+
+        setTasks((prevTasks) => prevTasks.map((t) => (t.id === draggingId ? { ...t, status: status } : t)));
+        setDraggingId(undefined);
+        if (tasks.find((t) => t.id === draggingId)?.status !== status) setToastMessage(`Task moved to ${status}`);
+    };
+
+    useEffect(() => {
+        if (!toastMessage) return;
+
+        const timer = setTimeout(() => {
+            setToastMessage(undefined);
+        }, 2000);
+
+        return () => clearTimeout(timer);
+    }, [toastMessage]);
+
     return (
         <div className="relative flex flex-col gap-8 px-10">
             <div className="flex justify-between">
-                <h2>My Tasks</h2>
+                <h2 className="text-xl font-bold tracking-wide">My Tasks</h2>
                 <Button
                     label={'+ New Task'}
-                    className="px-5 py-2 rounded-sm bg-blue-400 hover:bg-blue-500/80 active:scale-95 transition-all duration-300"
+                    className="px-5 py-2 rounded-sm bg-blue-600/50 hover:bg-blue-500/60 active:scale-95 transition-all duration-300"
                     onClick={openForm}
                 />
             </div>
             {isFormOpen && (
-                <div className="fixed inset-0 bg-[rgba(0,0,0,0.9)] z-50 flex items-center justify-center">
+                <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center">
                     <TaskForm
                         tasks={tasks}
                         close={closeForm}
@@ -122,16 +150,23 @@ const TaskBoard = () => {
             <Filters />
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 {STATUSES.map((status) => (
-                    <div className="border border-slate-400 rounded-md p-4" key={status}>
-                        <h2 className="text-xl font-bold uppercase text-center mb-4">{status}</h2>
-                        {tasks
-                            .filter((task) => task.status === status)
-                            .map((task) => (
-                                <TaskCard key={task.id} task={task} edit={editTask} del={deleteTask} />
-                            ))}
-                    </div>
+                    <TaskColumn
+                        key={status}
+                        status={status}
+                        tasks={tasks.filter((t) => t.status === status)}
+                        editTask={editTask}
+                        deleteTask={deleteTask}
+                        dragStart={handleDragStart}
+                        dragOver={handleDragOver}
+                        drop={handleDrop}
+                    />
                 ))}
             </div>
+            {toastMessage && (
+                <p className="fixed bottom-20 left-1/2 -translate-x-1/2 z-50 text-green-400 text-sm px-6 py-3 bg-green-700/40 rounded-md transition-all duration-300 animate-in fade-in slide-in-from-bottom-2">
+                    {toastMessage}
+                </p>
+            )}
         </div>
     );
 };

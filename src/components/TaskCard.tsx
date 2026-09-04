@@ -6,11 +6,16 @@ type TaskCardProps = {
     task: Task;
     edit: (id: string) => void;
     del: (id: string) => void;
+    dragStart: (id: string) => void;
 };
 
-const TaskCard = ({ task, edit, del }: TaskCardProps) => {
+const TaskCard = ({ task, edit, del, dragStart }: TaskCardProps) => {
     return (
-        <div className="border border-stone-400/80 rounded-sm p-4 my-3 flex justify-between items-center">
+        <div
+            draggable
+            className="border border-stone-400/80 rounded-sm p-4 my-3 flex justify-between items-center cursor-grab"
+            onDragStart={() => dragStart(task.id)}
+        >
             <div className="flex flex-col gap-2">
                 <p id="title" className="text-lg uppercase">
                     {task.title}
