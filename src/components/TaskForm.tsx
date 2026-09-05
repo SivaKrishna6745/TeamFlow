@@ -3,7 +3,8 @@
 import React, { useState } from 'react';
 import { STATUSES } from './TaskBoard';
 import Button from './Button';
-import { FormMode, Status, Task } from '@/types';
+import { FormMode, Status, Task, User } from '@/types';
+import { mockUsers } from '../../mockData';
 
 interface TaskFormProps {
     tasks: Task[];
@@ -11,7 +12,7 @@ interface TaskFormProps {
     add: (task: Task) => void;
     mode?: FormMode;
     editingTask: Task | undefined;
-    update?: (id: string, changes: { title?: string; description?: string; status?: Status }) => void;
+    update?: (id: string, changes: { title?: string; description?: string; assignee?: User; status?: Status }) => void;
 }
 
 const TaskForm = ({ tasks, close, add, mode = 'New', editingTask = undefined, update }: TaskFormProps) => {
@@ -20,6 +21,7 @@ const TaskForm = ({ tasks, close, add, mode = 'New', editingTask = undefined, up
     const [title, setTitle] = useState<string>(editMode ? (editingTask?.title ?? '') : '');
     const [description, setDescription] = useState<string>(editMode ? (editingTask?.description ?? '') : '');
     const [status, setStatus] = useState<Status>(editMode ? (editingTask?.status ?? 'Todo') : 'Todo');
+    const [assignee, setAssignee] = useState<User>(editMode ? (editingTask?.assignee ?? mockUsers[0]) : mockUsers[0]);
     const [error, setError] = useState<string>('');
 
     const submitTask = (e: React.FormEvent<HTMLFormElement>) => {
@@ -57,15 +59,20 @@ const TaskForm = ({ tasks, close, add, mode = 'New', editingTask = undefined, up
             description,
             status,
             createdAt: new Date().toISOString(),
+            assignee: {
+                userId: assignee.userId,
+                name: assignee.name,
+            },
         };
 
-        if (editMode && editingTask) update?.(editingTask.id, { title, description, status });
+        if (editMode && editingTask) update?.(editingTask.id, { title, description, assignee, status });
         else add(newTask);
 
         setTitle('');
         setDescription('');
         setStatus('Todo');
         setError('');
+        setAssignee(mockUsers[0]);
         close();
     };
 
@@ -99,6 +106,21 @@ const TaskForm = ({ tasks, close, add, mode = 'New', editingTask = undefined, up
                 className="border border-stone-300 rounded-sm px-2 py-1"
             ></textarea>
             {error && <p className="text-xs text-red-500">{error}</p>}
+            <select
+                name="assignee"
+                value={assignee.userId}
+                onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
+                    const user = mockUsers.find((user) => user.userId === e.target.value);
+                    if (user) setAssignee(user);
+                }}
+                className="border border-stone-300 bg-zinc-900 rounded-sm px-2 py-1"
+            >
+                {mockUsers.map((user) => (
+                    <option key={user.userId} value={user.userId}>
+                        {user.name}
+                    </option>
+                ))}
+            </select>
             <select
                 name="status"
                 value={status}

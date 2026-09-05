@@ -5,7 +5,7 @@ import Filters from './Filters';
 import Button from './Button';
 import { tasksData } from '../../mockData';
 import TaskForm from './TaskForm';
-import { Filter, FormMode, Status, Task } from '@/types';
+import { Filter, FormMode, Status, Task, User } from '@/types';
 import TaskColumn from './TaskColumn';
 
 export const STATUSES = ['Todo', 'In Progress', 'Done'] as const;
@@ -51,6 +51,8 @@ const TaskBoard = () => {
     const [toastMessage, setToastMessage] = useState<string | undefined>(undefined);
     const [filter, setFilter] = useState<Filter>('All');
 
+    const currentUserId = 'USR-1';
+
     const openForm = () => {
         setIsFormOpen(true);
     };
@@ -70,7 +72,10 @@ const TaskBoard = () => {
         setEditingTask(task);
     };
 
-    const updateTask = (id: string, changes: { title?: string; description?: string; status?: Status }) => {
+    const updateTask = (
+        id: string,
+        changes: { title?: string; description?: string; assignee?: User; status?: Status },
+    ) => {
         setTasks((prevTasks) =>
             prevTasks.map((t) =>
                 t.id === id
@@ -78,6 +83,7 @@ const TaskBoard = () => {
                           ...t,
                           title: changes.title ?? t.title,
                           description: changes.description ?? t.description,
+                          assignee: changes.assignee ?? t.assignee,
                           status: changes.status ?? t.status,
                       }
                     : t,
@@ -121,7 +127,12 @@ const TaskBoard = () => {
         setFilter(filter);
     };
 
-    const derivedTasks = filter === 'All' ? tasks : tasks.filter((t) => t.status === filter);
+    const derivedTasks =
+        filter === 'All'
+            ? tasks
+            : filter === 'Mine'
+              ? tasks.filter((t) => t.assignee.userId === currentUserId)
+              : tasks.filter((t) => t.status === filter);
 
     return (
         <div className="relative flex flex-col gap-8 px-10">
