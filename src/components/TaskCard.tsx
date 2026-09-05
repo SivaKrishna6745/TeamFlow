@@ -13,7 +13,7 @@ const TaskCard = ({ task, edit, del, dragStart }: TaskCardProps) => {
     return (
         <div
             draggable
-            className="border border-stone-400/80 rounded-sm p-4 my-3 flex justify-between items-baseline cursor-grab"
+            className="bg-zinc-900 rounded-sm p-4 my-3 flex justify-between items-baseline cursor-grab"
             onDragStart={() => dragStart(task.id)}
         >
             <div className="flex flex-col gap-2">
@@ -24,8 +24,8 @@ const TaskCard = ({ task, edit, del, dragStart }: TaskCardProps) => {
                     {task.description}
                 </p>
                 <p className="text-xs text-zinc-500">
-                    Assigned to <span className="font-medium text-zinc-300">{task.assignee.name}</span>
-                    <span className="ml-2 text-zinc-600">({task.assignee.userId})</span>
+                    Assigned to <span className="font-semibold text-zinc-300">{task.assignee.name}</span>
+                    <span className="ml-2 text-zinc-400 font-medium">({task.assignee.userId})</span>
                 </p>
             </div>
             <div className="flex gap-4">

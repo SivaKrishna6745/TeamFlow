@@ -59,6 +59,7 @@ const TaskBoard = () => {
 
     const closeForm = () => {
         setIsFormOpen(false);
+        setFormMode('New');
     };
 
     const addTask = (task: Task) => {
@@ -136,8 +137,8 @@ const TaskBoard = () => {
 
     return (
         <div className="relative flex flex-col gap-8 px-10">
-            <div className="flex justify-between">
-                <h2 className="text-xl font-bold tracking-wide">My Tasks</h2>
+            <div className="flex justify-between items-center border-b border-zinc-800 pb-8">
+                <h2 className="text-2xl font-bold tracking-wider">My Tasks</h2>
                 <Button
                     label={'+ New Task'}
                     className="px-5 py-2 rounded-sm bg-blue-600/50 hover:bg-blue-500/60 active:scale-95 transition-all duration-300"
@@ -165,7 +166,10 @@ const TaskBoard = () => {
                     onCancel={() => setConfirmDel(undefined)}
                 />
             )}
-            <Filters selectedFilter={filter} select={selectFilter} />
+            <div className="flex items-center gap-8 text-sm bg-zinc-800/90 px-4 py-2 rounded-md">
+                <span className="uppercase tracking-wide font-medium text-zinc-400">Filters: </span>
+                <Filters selectedFilter={filter} select={selectFilter} />
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 {STATUSES.map((status) => (
                     <TaskColumn

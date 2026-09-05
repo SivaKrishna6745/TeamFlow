@@ -15,6 +15,9 @@ interface TaskFormProps {
     update?: (id: string, changes: { title?: string; description?: string; assignee?: User; status?: Status }) => void;
 }
 
+const FORM_FIELD_CLASSNAME =
+    'border border-zinc-500 rounded-sm px-2 py-1 focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-400';
+
 const TaskForm = ({ tasks, close, add, mode = 'New', editingTask = undefined, update }: TaskFormProps) => {
     const editMode = mode === 'Edit';
 
@@ -78,65 +81,95 @@ const TaskForm = ({ tasks, close, add, mode = 'New', editingTask = undefined, up
 
     return (
         <form
-            className="w-full max-w-md bg-zinc-900 text-white border border-zinc-700 rounded-lg p-6 flex flex-col gap-4 shadow-xl relative"
+            className="w-full max-w-md bg-zinc-900 text-white border border-zinc-700 rounded-lg p-6 flex flex-col gap-6 shadow-xl relative"
             onSubmit={submitTask}
         >
-            <Button className="absolute top-3 right-3 text-zinc-400 hover:text-white" label="X" onClick={close} />
-            <h2 className="text-center text-2xl uppercase font-bold tracking-wide">
-                {editMode ? 'Edit Task' : 'New Task'}
-            </h2>
-            <input
-                type="text"
-                name="title"
-                placeholder="title of the task..."
-                value={title}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setTitle(e.target.value)}
-                className="border border-stone-300 rounded-sm px-2 py-1"
-            />
-            <textarea
-                name="description"
-                placeholder="description of the task..."
-                rows={4}
-                cols={30}
-                value={description}
-                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {
-                    setDescription(e.target.value);
-                    setError('');
-                }}
-                className="border border-stone-300 rounded-sm px-2 py-1"
-            ></textarea>
+            <div className="flex justify-between items-center border-b-2 border-zinc-800 pb-4">
+                <h2 className="text-center text-2xl uppercase font-bold tracking-wide">
+                    {editMode ? 'Edit Task' : 'New Task'}
+                </h2>
+                <Button
+                    className="text-zinc-400 hover:text-zinc-300 bg-zinc-800 hover:bg-zinc-600 rounded-full px-3 py-1 text-md"
+                    label="x"
+                    onClick={close}
+                />
+            </div>
+            <div className="flex flex-col gap-2">
+                <label htmlFor="id" className="text-xs uppercase tracking-wide text-zinc-400">
+                    Title
+                </label>
+                <input
+                    type="text"
+                    id="title"
+                    name="title"
+                    placeholder="Title of the task..."
+                    value={title}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setTitle(e.target.value)}
+                    className={FORM_FIELD_CLASSNAME}
+                />
+            </div>
+            <div className="flex flex-col gap-2">
+                <label htmlFor="description" className="text-xs uppercase tracking-wide text-zinc-400">
+                    Description
+                </label>
+                <textarea
+                    id="description"
+                    name="description"
+                    placeholder="Description of the task..."
+                    rows={4}
+                    cols={30}
+                    value={description}
+                    onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {
+                        setDescription(e.target.value);
+                        setError('');
+                    }}
+                    className={`${FORM_FIELD_CLASSNAME} resize-none`}
+                ></textarea>
+            </div>
             {error && <p className="text-xs text-red-500">{error}</p>}
-            <select
-                name="assignee"
-                value={assignee.userId}
-                onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
-                    const user = mockUsers.find((user) => user.userId === e.target.value);
-                    if (user) setAssignee(user);
-                }}
-                className="border border-stone-300 bg-zinc-900 rounded-sm px-2 py-1"
-            >
-                {mockUsers.map((user) => (
-                    <option key={user.userId} value={user.userId}>
-                        {user.name}
-                    </option>
-                ))}
-            </select>
-            <select
-                name="status"
-                value={status}
-                onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setStatus(e.target.value as Status)}
-                className="border border-stone-300 bg-zinc-900 rounded-sm px-2 py-1"
-            >
-                {STATUSES.map((st) => (
-                    <option key={st} value={st}>
-                        {st}
-                    </option>
-                ))}
-            </select>
+            <div className="flex flex-col gap-2">
+                <label htmlFor="assignee" className="text-xs uppercase tracking-wide text-zinc-400">
+                    Assignee
+                </label>
+                <select
+                    id="assignee"
+                    name="assignee"
+                    value={assignee.userId}
+                    onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
+                        const user = mockUsers.find((user) => user.userId === e.target.value);
+                        if (user) setAssignee(user);
+                    }}
+                    className={`${FORM_FIELD_CLASSNAME} cursor-pointer`}
+                >
+                    {mockUsers.map((user) => (
+                        <option key={user.userId} value={user.userId} className="bg-zinc-900">
+                            {user.name}
+                        </option>
+                    ))}
+                </select>
+            </div>
+            <div className="flex flex-col gap-2">
+                <label htmlFor="status" className="text-xs uppercase tracking-wide text-zinc-400">
+                    Status
+                </label>
+                <select
+                    id="status"
+                    name="status"
+                    value={status}
+                    onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setStatus(e.target.value as Status)}
+                    className={`${FORM_FIELD_CLASSNAME} cursor-pointer`}
+                >
+                    {STATUSES.map((st) => (
+                        <option key={st} value={st} className="bg-zinc-900">
+                            {st}
+                        </option>
+                    ))}
+                </select>
+            </div>
             <Button
                 type="submit"
-                label="Submit"
-                className="px-5 py-2 bg-green-400 hover:bg-green-500/80 active:scale-95 rounded-sm transition-all duration-300"
+                label={editMode ? 'Save Changes' : 'Add Task'}
+                className="px-5 py-2 bg-green-600/70 hover:bg-green-400/70 text-zinc-200 font-semibold tracking-wider active:scale-98 rounded-sm transition-all duration-300"
             />
         </form>
     );

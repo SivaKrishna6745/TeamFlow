@@ -3,8 +3,8 @@ import React from 'react';
 
 const Header = () => {
     return (
-        <div className="flex justify-between items-center px-10 dark:bg-white/40">
-            <a href="#" className="text-2xl font-bold tracking-wide font-mono">
+        <div className="flex justify-between items-center px-10 py-3 dark:bg-zinc-800/90">
+            <a href="#" className="text-3xl font-bold tracking-wider font-sans">
                 TeamFlow
             </a>
             <Image
