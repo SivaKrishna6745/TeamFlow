@@ -10,6 +10,11 @@ type TaskCardProps = {
 };
 
 const TaskCard = ({ task, edit, del, dragStart }: TaskCardProps) => {
+    const isOverDue =
+        task.dueDate !== undefined
+            ? new Date(task.dueDate).toISOString().split('T')[0] < new Date().toISOString().split('T')[0]
+            : '';
+
     return (
         <div
             draggable
@@ -17,8 +22,16 @@ const TaskCard = ({ task, edit, del, dragStart }: TaskCardProps) => {
             onDragStart={() => dragStart(task.id)}
         >
             <div className="flex flex-col gap-2">
-                <p id="title" className="text-base font-semibold tracking-wide text-zinc-100 uppercase wrap-break-word">
-                    {task.title}
+                <p
+                    id="title"
+                    className="flex flex-wrap items-center gap-2 text-base font-semibold tracking-wide text-zinc-100 break-words"
+                >
+                    <span>{task.title}</span>
+                    {isOverDue && (
+                        <span className="inline-flex items-center gap-1 rounded-full bg-red-500/10 px-2 py-0.5 text-xs font-bold uppercase tracking-wider text-red-400 border border-red-500/20">
+                            ⚠️ Overdue
+                        </span>
+                    )}
                 </p>
                 <p id="descption" className="text-sm text-zinc-400 leading-relaxed wrap-break-word">
                     {task.description}
