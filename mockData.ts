@@ -11,6 +11,7 @@ export const tasksData: Task[] = [
             userId: 'USR-1',
             name: 'Siva Krishna',
         },
+        dueDate: '2026-09-05T12:52:28.953Z',
     },
     {
         id: '2',
@@ -33,6 +34,7 @@ export const tasksData: Task[] = [
             userId: 'USR-2',
             name: 'Mahesh',
         },
+        dueDate: '2026-09-08T12:52:28.953Z',
     },
     {
         id: '4',
@@ -44,6 +46,7 @@ export const tasksData: Task[] = [
             userId: 'USR-3',
             name: 'Dileep',
         },
+        dueDate: '2026-09-10T12:52:28.953Z',
     },
     {
         id: '5',

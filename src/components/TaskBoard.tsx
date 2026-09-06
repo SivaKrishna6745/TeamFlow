@@ -75,7 +75,7 @@ const TaskBoard = () => {
 
     const updateTask = (
         id: string,
-        changes: { title?: string; description?: string; assignee?: User; status?: Status },
+        changes: { title?: string; description?: string; assignee?: User; status?: Status; dueDate?: string },
     ) => {
         setTasks((prevTasks) =>
             prevTasks.map((t) =>
@@ -86,6 +86,7 @@ const TaskBoard = () => {
                           description: changes.description ?? t.description,
                           assignee: changes.assignee ?? t.assignee,
                           status: changes.status ?? t.status,
+                          dueDate: changes.dueDate ?? t.dueDate,
                       }
                     : t,
             ),

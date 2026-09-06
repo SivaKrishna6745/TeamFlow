@@ -16,4 +16,5 @@ export interface Task {
     status: Status;
     createdAt: string;
     assignee: User;
+    dueDate?: string;
 }

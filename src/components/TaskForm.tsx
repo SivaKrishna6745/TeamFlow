@@ -12,7 +12,10 @@ interface TaskFormProps {
     add: (task: Task) => void;
     mode?: FormMode;
     editingTask: Task | undefined;
-    update?: (id: string, changes: { title?: string; description?: string; assignee?: User; status?: Status }) => void;
+    update?: (
+        id: string,
+        changes: { title?: string; description?: string; assignee?: User; status?: Status; dueDate?: string },
+    ) => void;
 }
 
 const FORM_FIELD_CLASSNAME =
@@ -25,6 +28,9 @@ const TaskForm = ({ tasks, close, add, mode = 'New', editingTask = undefined, up
     const [description, setDescription] = useState<string>(editMode ? (editingTask?.description ?? '') : '');
     const [status, setStatus] = useState<Status>(editMode ? (editingTask?.status ?? 'Todo') : 'Todo');
     const [assignee, setAssignee] = useState<User>(editMode ? (editingTask?.assignee ?? mockUsers[0]) : mockUsers[0]);
+    const [dueDate, setDueDate] = useState<string>(
+        editMode && editingTask?.dueDate ? (new Date(editingTask?.dueDate).toISOString().split('T')[0] ?? '') : '',
+    );
     const [error, setError] = useState<string>('');
 
     const submitTask = (e: React.FormEvent<HTMLFormElement>) => {
@@ -66,9 +72,10 @@ const TaskForm = ({ tasks, close, add, mode = 'New', editingTask = undefined, up
                 userId: assignee.userId,
                 name: assignee.name,
             },
+            dueDate: dueDate ? new Date(dueDate).toISOString() : undefined,
         };
 
-        if (editMode && editingTask) update?.(editingTask.id, { title, description, assignee, status });
+        if (editMode && editingTask) update?.(editingTask.id, { title, description, assignee, status, dueDate });
         else add(newTask);
 
         setTitle('');
@@ -76,6 +83,7 @@ const TaskForm = ({ tasks, close, add, mode = 'New', editingTask = undefined, up
         setStatus('Todo');
         setError('');
         setAssignee(mockUsers[0]);
+        setDueDate('');
         close();
     };
 
@@ -165,6 +173,19 @@ const TaskForm = ({ tasks, close, add, mode = 'New', editingTask = undefined, up
                         </option>
                     ))}
                 </select>
+            </div>
+            <div className="flex flex-col gap-2">
+                <label htmlFor="dueDate" className="text-xs uppercase tracking-wide text-zinc-400">
+                    Due Date
+                </label>
+                <input
+                    type="date"
+                    id="dueDate"
+                    name="dueDate"
+                    value={dueDate}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDueDate(e.target.value)}
+                    className={FORM_FIELD_CLASSNAME}
+                />
             </div>
             <Button
                 type="submit"

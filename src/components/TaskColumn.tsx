@@ -29,7 +29,7 @@ const TaskColumn = ({ status, tasks, editTask, deleteTask, dragStart, dragOver, 
             onDragEnter={() => setIsDragOver(true)}
             onDragOver={dragOver}
             onDragLeave={handleDragLeave}
-            className={`bg-zinc-800/90 rounded-md p-4 transition-all duration-75 ${isDragOver ? 'shadow-md shadow-white/50' : ''}`}
+            className={`bg-zinc-800/90 border rounded-md p-4 transition-all duration-75 ${isDragOver ? 'border-zinc-600 shadow-sm shadow-white/20' : 'border-zinc-800'}`}
         >
             <h2 className="text-xl font-bold uppercase text-center mb-4 text-zinc-200 tracking-wide pb-3 border-b-2 border-zinc-400">
                 {status}
