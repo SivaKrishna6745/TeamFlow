@@ -5,12 +5,14 @@ import Filters from './Filters';
 import Button from './Button';
 import { tasksData } from '../../mockData';
 import TaskForm from './TaskForm';
-import { Filter, FormMode, Status, Task, User } from '@/types';
+import { Filter, FormMode, SortOptions, Status, Task, User } from '@/types';
 import TaskColumn from './TaskColumn';
 
 export const STATUSES = ['Todo', 'In Progress', 'Done'] as const;
 
 export const FORM_MODES = ['New', 'Edit'] as const;
+
+export const SORT_OPTIONS = ['newest', 'oldest'] as const;
 
 const DelConfirmationPopup = ({ onConfirm, onCancel }: { onConfirm: () => void; onCancel: () => void }) => {
     return (
@@ -50,6 +52,7 @@ const TaskBoard = () => {
     const [draggingId, setDraggingId] = useState<string | undefined>(undefined);
     const [toastMessage, setToastMessage] = useState<string | undefined>(undefined);
     const [filter, setFilter] = useState<Filter>('All');
+    const [sortOption, setSortOption] = useState<SortOptions>('newest');
 
     const currentUserId = 'USR-1';
 
@@ -136,6 +139,15 @@ const TaskBoard = () => {
               ? tasks.filter((t) => t.assignee.userId === currentUserId)
               : tasks.filter((t) => t.status === filter);
 
+    const handleSort = () => {
+        setSortOption((prev) => (prev === 'newest' ? 'oldest' : 'newest'));
+    };
+
+    const sortedTasks =
+        sortOption === 'newest'
+            ? [...derivedTasks].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+            : [...derivedTasks].sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+
     return (
         <div className="relative flex flex-col gap-8 px-10">
             <div className="flex justify-between items-center border-b border-zinc-800 pb-8">
@@ -167,16 +179,27 @@ const TaskBoard = () => {
                     onCancel={() => setConfirmDel(undefined)}
                 />
             )}
-            <div className="flex items-center gap-8 text-sm bg-zinc-800/90 px-4 py-2 rounded-md">
-                <span className="uppercase tracking-wide font-medium text-zinc-400">Filters: </span>
-                <Filters selectedFilter={filter} select={selectFilter} />
+            <div className="flex justify-between">
+                <div className="flex items-center gap-8 text-sm bg-zinc-900/60 px-4 py-2 rounded-md border border-zinc-800">
+                    <span className="uppercase tracking-wide font-medium text-zinc-400">Filters: </span>
+                    <div className="h-4 w-px bg-zinc-800" />
+                    <Filters selectedFilter={filter} select={selectFilter} />
+                </div>
+                <div className="flex items-center gap-8 text-sm bg-zinc-900/60 px-4 py-2 rounded-md border border-zinc-800">
+                    <Button
+                        label="Sort"
+                        className="px-3 py-1 rounded-sm bg-mauve-800 hover:bg-mauve-700/80 active:scale-95 transition-all duration-300"
+                        onClick={handleSort}
+                    />
+                    <span className="w-16 capitalize">{sortOption}</span>
+                </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 {STATUSES.map((status) => (
                     <TaskColumn
                         key={status}
                         status={status}
-                        tasks={derivedTasks.filter((t) => t.status === status)}
+                        tasks={sortedTasks.filter((t) => t.status === status)}
                         editTask={editTask}
                         deleteTask={deleteTask}
                         dragStart={handleDragStart}
