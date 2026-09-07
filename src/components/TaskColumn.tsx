@@ -34,9 +34,13 @@ const TaskColumn = ({ status, tasks, editTask, deleteTask, dragStart, dragOver, 
             <h2 className="text-xl font-bold uppercase text-center mb-4 text-zinc-200 tracking-wide pb-3 border-b-2 border-zinc-400">
                 {status}
             </h2>
-            {tasks.map((task) => (
-                <TaskCard key={task.id} task={task} edit={editTask} del={deleteTask} dragStart={dragStart} />
-            ))}
+            {tasks.length === 0 ? (
+                <p className="text-center text-sm text-zinc-500 py-8">No tasks here</p>
+            ) : (
+                tasks.map((task) => (
+                    <TaskCard key={task.id} task={task} edit={editTask} del={deleteTask} dragStart={dragStart} />
+                ))
+            )}
         </div>
     );
 };
