@@ -9,11 +9,23 @@ type TaskCardProps = {
     dragStart: (id: string) => void;
 };
 
+const getPriorityColor = (priority: string) => {
+    switch (priority?.toLowerCase()) {
+        case 'high':
+            return 'bg-red-400';
+        case 'medium':
+            return 'bg-amber-400';
+        case 'low':
+            return 'bg-emerald-400';
+        default:
+            return 'bg-zinc-400';
+    }
+};
+
 const TaskCard = ({ task, edit, del, dragStart }: TaskCardProps) => {
-    const isOverDue =
-        task.dueDate !== undefined
-            ? new Date(task.dueDate).toISOString().split('T')[0] < new Date().toISOString().split('T')[0]
-            : '';
+    const isOverDue = task.dueDate
+        ? new Date(task.dueDate).toISOString().split('T')[0] < new Date().toISOString().split('T')[0]
+        : false;
 
     return (
         <div
@@ -24,7 +36,7 @@ const TaskCard = ({ task, edit, del, dragStart }: TaskCardProps) => {
             <div className="flex flex-col gap-2">
                 <p
                     id="title"
-                    className="flex flex-wrap items-center gap-2 text-base font-semibold tracking-wide text-zinc-100 break-words"
+                    className="flex flex-wrap items-center gap-2 text-base font-semibold tracking-wide text-zinc-100 wrap-break-word"
                 >
                     <span>{task.title}</span>
                     {isOverDue && (
@@ -32,6 +44,11 @@ const TaskCard = ({ task, edit, del, dragStart }: TaskCardProps) => {
                             ⚠️ Overdue
                         </span>
                     )}
+                    <span
+                        className={`inline-flex items-center text-xs px-2 py-0.5 rounded-full uppercase tracking-wider text-zinc-900 ${getPriorityColor(task.priority)}`}
+                    >
+                        {task.priority}
+                    </span>
                 </p>
                 <p id="descption" className="text-sm text-zinc-400 leading-relaxed wrap-break-word">
                     {task.description}

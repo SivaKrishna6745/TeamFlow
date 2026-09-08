@@ -7,12 +7,7 @@ import { tasksData } from '../../mockData';
 import TaskForm from './TaskForm';
 import { Filter, FormMode, SortOptions, Status, Task, User } from '@/types';
 import TaskColumn from './TaskColumn';
-
-export const STATUSES = ['Todo', 'In Progress', 'Done'] as const;
-
-export const FORM_MODES = ['New', 'Edit'] as const;
-
-export const SORT_OPTIONS = ['newest', 'oldest'] as const;
+import { STATUSES } from '@/constants';
 
 const DelConfirmationPopup = ({ onConfirm, onCancel }: { onConfirm: () => void; onCancel: () => void }) => {
     return (
@@ -78,7 +73,7 @@ const TaskBoard = () => {
 
     const updateTask = (
         id: string,
-        changes: { title?: string; description?: string; assignee?: User; status?: Status; dueDate?: string },
+        changes: { title?: string; description?: string; assignee?: User; status?: Status; dueDate?: string | null },
     ) => {
         setTasks((prevTasks) =>
             prevTasks.map((t) =>
@@ -89,7 +84,7 @@ const TaskBoard = () => {
                           description: changes.description ?? t.description,
                           assignee: changes.assignee ?? t.assignee,
                           status: changes.status ?? t.status,
-                          dueDate: changes.dueDate ?? t.dueDate,
+                          dueDate: changes.dueDate === null ? undefined : (changes.dueDate ?? t.dueDate),
                       }
                     : t,
             ),
@@ -140,7 +135,7 @@ const TaskBoard = () => {
               : tasks.filter((t) => t.status === filter);
 
     const handleSort = () => {
-        setSortOption((prev) => (prev === 'newest' ? 'oldest' : 'newest'));
+        setSortOption((prev: SortOptions) => (prev === 'newest' ? 'oldest' : 'newest'));
     };
 
     const sortedTasks =

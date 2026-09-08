@@ -6,6 +6,7 @@ export const tasksData: Task[] = [
         title: 'Task 1',
         description: 'Description for Task 1',
         status: 'Todo',
+        priority: 'Medium',
         createdAt: '2026-09-05T12:52:28.953Z',
         assignee: {
             userId: 'USR-1',
@@ -18,6 +19,7 @@ export const tasksData: Task[] = [
         title: 'Task 2',
         description: 'Description for Task 2',
         status: 'Todo',
+        priority: 'Low',
         createdAt: '2026-09-04T12:52:28.953Z',
         assignee: {
             userId: 'USR-3',
@@ -29,6 +31,7 @@ export const tasksData: Task[] = [
         title: 'Task 3',
         description: 'Description for Task 3',
         status: 'Todo',
+        priority: 'Medium',
         createdAt: '2026-09-07T12:52:28.953Z',
         assignee: {
             userId: 'USR-2',
@@ -41,6 +44,7 @@ export const tasksData: Task[] = [
         title: 'Task 4',
         description: 'Description for Task 4',
         status: 'In Progress',
+        priority: 'High',
         createdAt: '2026-09-07T12:52:28.953Z',
         assignee: {
             userId: 'USR-3',
@@ -53,6 +57,7 @@ export const tasksData: Task[] = [
         title: 'Task 5',
         description: 'Description for Task 5',
         status: 'In Progress',
+        priority: 'Medium',
         createdAt: '2026-09-06T12:52:28.953Z',
         assignee: {
             userId: 'USR-2',
@@ -64,6 +69,7 @@ export const tasksData: Task[] = [
         title: 'Task 6',
         description: 'Description for Task 6',
         status: 'Done',
+        priority: 'High',
         createdAt: '2026-09-02T12:52:28.953Z',
         assignee: {
             userId: 'USR-1',

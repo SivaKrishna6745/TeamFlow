@@ -1,9 +1,9 @@
 'use client';
 
 import React, { useState } from 'react';
-import { STATUSES } from './TaskBoard';
+import { PRIORITIES, STATUSES } from '@/constants';
 import Button from './Button';
-import { FormMode, Status, Task, User } from '@/types';
+import { FormMode, Priority, Status, Task, User } from '@/types';
 import { mockUsers } from '../../mockData';
 
 interface TaskFormProps {
@@ -14,7 +14,14 @@ interface TaskFormProps {
     editingTask: Task | undefined;
     update?: (
         id: string,
-        changes: { title?: string; description?: string; assignee?: User; status?: Status; dueDate?: string },
+        changes: {
+            title?: string;
+            description?: string;
+            assignee?: User;
+            status?: Status;
+            priority?: Priority;
+            dueDate?: string;
+        },
     ) => void;
 }
 
@@ -27,6 +34,7 @@ const TaskForm = ({ tasks, close, add, mode = 'New', editingTask = undefined, up
     const [title, setTitle] = useState<string>(editMode ? (editingTask?.title ?? '') : '');
     const [description, setDescription] = useState<string>(editMode ? (editingTask?.description ?? '') : '');
     const [status, setStatus] = useState<Status>(editMode ? (editingTask?.status ?? 'Todo') : 'Todo');
+    const [priority, setPriority] = useState<Priority>(editMode ? (editingTask?.priority ?? 'Medium') : 'Medium');
     const [assignee, setAssignee] = useState<User>(editMode ? (editingTask?.assignee ?? mockUsers[0]) : mockUsers[0]);
     const [dueDate, setDueDate] = useState<string>(
         editMode && editingTask?.dueDate ? (new Date(editingTask?.dueDate).toISOString().split('T')[0] ?? '') : '',
@@ -67,6 +75,7 @@ const TaskForm = ({ tasks, close, add, mode = 'New', editingTask = undefined, up
             title,
             description,
             status,
+            priority,
             createdAt: new Date().toISOString(),
             assignee: {
                 userId: assignee.userId,
@@ -75,7 +84,8 @@ const TaskForm = ({ tasks, close, add, mode = 'New', editingTask = undefined, up
             dueDate: dueDate ? new Date(dueDate).toISOString() : undefined,
         };
 
-        if (editMode && editingTask) update?.(editingTask.id, { title, description, assignee, status, dueDate });
+        if (editMode && editingTask)
+            update?.(editingTask.id, { title, description, assignee, status, priority, dueDate });
         else add(newTask);
 
         setTitle('');
@@ -170,6 +180,24 @@ const TaskForm = ({ tasks, close, add, mode = 'New', editingTask = undefined, up
                     {STATUSES.map((st) => (
                         <option key={st} value={st} className="bg-zinc-900">
                             {st}
+                        </option>
+                    ))}
+                </select>
+            </div>
+            <div className="flex flex-col gap-2">
+                <label htmlFor="priority" className="text-xs uppercase tracking-wide text-zinc-400">
+                    Priority
+                </label>
+                <select
+                    id="priority"
+                    name="priority"
+                    value={priority}
+                    onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setPriority(e.target.value as Priority)}
+                    className={`${FORM_FIELD_CLASSNAME} cursor-pointer`}
+                >
+                    {PRIORITIES.map((pri) => (
+                        <option key={pri} value={pri} className="bg-zinc-900">
+                            {pri}
                         </option>
                     ))}
                 </select>
