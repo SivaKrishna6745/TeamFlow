@@ -8,6 +8,7 @@ import TaskForm from './TaskForm';
 import { Filter, FormMode, SortOptions, Status, Task, User } from '@/types';
 import TaskColumn from './TaskColumn';
 import { STATUSES } from '@/constants';
+import SearchBar from './SearchBar';
 
 const DelConfirmationPopup = ({ onConfirm, onCancel }: { onConfirm: () => void; onCancel: () => void }) => {
     return (
@@ -48,6 +49,7 @@ const TaskBoard = () => {
     const [toastMessage, setToastMessage] = useState<string | undefined>(undefined);
     const [filter, setFilter] = useState<Filter>('All');
     const [sortOption, setSortOption] = useState<SortOptions>('newest');
+    const [search, setSearch] = useState<string>('');
 
     const currentUserId = 'USR-1';
 
@@ -138,10 +140,19 @@ const TaskBoard = () => {
         setSortOption((prev: SortOptions) => (prev === 'newest' ? 'oldest' : 'newest'));
     };
 
+    const searchedTasks =
+        search.trim() === ''
+            ? derivedTasks
+            : derivedTasks.filter(
+                  (task) =>
+                      task.title.toLowerCase().includes(search.toLowerCase()) ||
+                      task.description.toLowerCase().includes(search.toLowerCase()),
+              );
+
     const sortedTasks =
         sortOption === 'newest'
-            ? [...derivedTasks].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-            : [...derivedTasks].sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+            ? [...searchedTasks].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+            : [...searchedTasks].sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
 
     return (
         <div className="relative flex flex-col gap-8 px-10">
@@ -189,6 +200,7 @@ const TaskBoard = () => {
                     <span className="w-16 capitalize">{sortOption}</span>
                 </div>
             </div>
+            <SearchBar value={search} onChange={(e) => setSearch(e.target.value)} />
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 {STATUSES.map((status) => (
                     <TaskColumn
