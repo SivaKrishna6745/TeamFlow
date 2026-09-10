@@ -7,6 +7,7 @@ type TaskCardProps = {
     edit: (id: string) => void;
     del: (id: string) => void;
     dragStart: (id: string) => void;
+    setSelectedTask: (task: Task) => void;
 };
 
 const getPriorityColor = (priority: string) => {
@@ -22,7 +23,7 @@ const getPriorityColor = (priority: string) => {
     }
 };
 
-const TaskCard = ({ task, edit, del, dragStart }: TaskCardProps) => {
+const TaskCard = ({ task, edit, del, dragStart, setSelectedTask }: TaskCardProps) => {
     const isOverDue = task.dueDate
         ? new Date(task.dueDate).toISOString().split('T')[0] < new Date().toISOString().split('T')[0]
         : false;
@@ -32,6 +33,7 @@ const TaskCard = ({ task, edit, del, dragStart }: TaskCardProps) => {
             draggable
             className="group bg-zinc-900 border border-zinc-800 hover:border-zinc-700 rounded-sm p-5 my-3 flex justify-between items-baseline cursor-grab active:cursor-grabbing hover:shadow-md hover:shadow-black/20 transition-all duration-200"
             onDragStart={() => dragStart(task.id)}
+            onClick={() => setSelectedTask(task)}
         >
             <div className="flex flex-col gap-2">
                 <p

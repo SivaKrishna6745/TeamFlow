@@ -9,6 +9,7 @@ import { Filter, FormMode, SortOptions, Status, Task, User } from '@/types';
 import TaskColumn from './TaskColumn';
 import { STATUSES } from '@/constants';
 import SearchBar from './SearchBar';
+import TaskDetails from './TaskDetails';
 
 const DelConfirmationPopup = ({ onConfirm, onCancel }: { onConfirm: () => void; onCancel: () => void }) => {
     return (
@@ -50,6 +51,7 @@ const TaskBoard = () => {
     const [filter, setFilter] = useState<Filter>('All');
     const [sortOption, setSortOption] = useState<SortOptions>('newest');
     const [search, setSearch] = useState<string>('');
+    const [selectedTask, setSelectedTask] = useState<Task | undefined>(undefined);
 
     const currentUserId = 'USR-1';
 
@@ -154,6 +156,8 @@ const TaskBoard = () => {
             ? [...searchedTasks].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
             : [...searchedTasks].sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
 
+    const handleSelectedTask = (task: Task) => setSelectedTask(task);
+
     return (
         <div className="relative flex flex-col gap-8 px-10">
             <div className="flex justify-between items-center border-b border-zinc-800 pb-8">
@@ -212,9 +216,11 @@ const TaskBoard = () => {
                         dragStart={handleDragStart}
                         dragOver={handleDragOver}
                         drop={handleDrop}
+                        setSelectedTask={handleSelectedTask}
                     />
                 ))}
             </div>
+            {selectedTask && <TaskDetails task={selectedTask} close={() => setSelectedTask(undefined)} />}
             {toastMessage && (
                 <p className="fixed bottom-20 left-1/2 -translate-x-1/2 z-50 text-green-400 text-sm px-6 py-3 bg-green-700/40 rounded-md transition-all duration-300 animate-in fade-in slide-in-from-bottom-2">
                     {toastMessage}

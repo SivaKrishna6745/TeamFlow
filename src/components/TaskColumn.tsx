@@ -10,9 +10,19 @@ type TaskColumnProps = {
     dragStart: (id: string) => void;
     dragOver: (e: React.DragEvent<HTMLDivElement>) => void;
     drop: (colStatus: Status) => void;
+    setSelectedTask: (Task: Task) => void;
 };
 
-const TaskColumn = ({ status, tasks, editTask, deleteTask, dragStart, dragOver, drop }: TaskColumnProps) => {
+const TaskColumn = ({
+    status,
+    tasks,
+    editTask,
+    deleteTask,
+    dragStart,
+    dragOver,
+    drop,
+    setSelectedTask,
+}: TaskColumnProps) => {
     const [isDragOver, setIsDragOver] = useState<boolean>(false);
 
     const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
@@ -38,7 +48,14 @@ const TaskColumn = ({ status, tasks, editTask, deleteTask, dragStart, dragOver, 
                 <p className="text-center text-sm text-zinc-500 py-8">No tasks here</p>
             ) : (
                 tasks.map((task) => (
-                    <TaskCard key={task.id} task={task} edit={editTask} del={deleteTask} dragStart={dragStart} />
+                    <TaskCard
+                        key={task.id}
+                        task={task}
+                        edit={editTask}
+                        del={deleteTask}
+                        dragStart={dragStart}
+                        setSelectedTask={setSelectedTask}
+                    />
                 ))
             )}
         </div>
