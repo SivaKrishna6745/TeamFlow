@@ -50,7 +50,7 @@ const TaskCard = ({ task, edit, del, dragStart }: TaskCardProps) => {
                         {task.priority}
                     </span>
                 </p>
-                <p id="descption" className="text-sm text-zinc-400 leading-relaxed wrap-break-word">
+                <p id="descption" className="text-sm text-zinc-400 leading-relaxed wrap-break-word w-64 line-clamp-2">
                     {task.description}
                 </p>
                 <p className="text-xs text-zinc-500">
