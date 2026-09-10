@@ -32,7 +32,7 @@ const TaskColumn = ({ status, tasks, editTask, deleteTask, dragStart, dragOver, 
             className={`bg-zinc-800/90 border rounded-md p-4 transition-all duration-75 ${isDragOver ? 'border-zinc-600 shadow-sm shadow-white/20' : 'border-zinc-800'}`}
         >
             <h2 className="text-xl font-bold uppercase text-center mb-4 text-zinc-200 tracking-wide pb-3 border-b-2 border-zinc-400">
-                {status}
+                {status} ({tasks.length})
             </h2>
             {tasks.length === 0 ? (
                 <p className="text-center text-sm text-zinc-500 py-8">No tasks here</p>
