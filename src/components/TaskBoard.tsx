@@ -206,28 +206,40 @@ const TaskBoard = () => {
                 <div className="flex items-center gap-8 text-sm bg-zinc-900/60 px-4 py-2 rounded-md border border-zinc-800">
                     <Button
                         label="Sort"
-                        className="px-3 py-1 rounded-sm bg-mauve-800 hover:bg-mauve-700/80 active:scale-95 transition-all duration-300"
+                        className="px-3 py-1 rounded-sm bg-mauve-800 hover:bg-mauve-700/80 active:scale-98 transition-all duration-200"
                         onClick={handleSort}
                     />
                     <span className="w-16 capitalize">{sortOption}</span>
                 </div>
             </div>
             <SearchBar value={search} onChange={(e) => setSearch(e.target.value)} />
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                {STATUSES.map((status) => (
-                    <TaskColumn
-                        key={status}
-                        status={status}
-                        tasks={sortedTasks.filter((t) => t.status === status)}
-                        editTask={editTask}
-                        deleteTask={deleteTask}
-                        dragStart={handleDragStart}
-                        dragOver={handleDragOver}
-                        drop={handleDrop}
-                        setSelectedTask={handleSelectedTask}
+            {tasks.length === 0 ? (
+                <div className="flex flex-col gap-1 items-center justify-center py-16 text-center border border-zinc-800/60 rounded-xl bg-zinc-900/30">
+                    <p className="font-medium text-zinc-400">No tasks yet</p>
+                    <p className="mt-1 text-sm text-zinc-500">Create a task to get started.</p>
+                    <Button
+                        label={'+ New Task'}
+                        className="mt-6 px-5 py-2 rounded-sm bg-blue-600/50 hover:bg-blue-500/60 active:scale-98 transition-all duration-200"
+                        onClick={openForm}
                     />
-                ))}
-            </div>
+                </div>
+            ) : (
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    {STATUSES.map((status) => (
+                        <TaskColumn
+                            key={status}
+                            status={status}
+                            tasks={sortedTasks.filter((t) => t.status === status)}
+                            editTask={editTask}
+                            deleteTask={deleteTask}
+                            dragStart={handleDragStart}
+                            dragOver={handleDragOver}
+                            drop={handleDrop}
+                            setSelectedTask={handleSelectedTask}
+                        />
+                    ))}
+                </div>
+            )}
             {selectedTask && (
                 <TaskDetails task={selectedTask} close={() => setSelectedTask(undefined)} edit={editTask} />
             )}
