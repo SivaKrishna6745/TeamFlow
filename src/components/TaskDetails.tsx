@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import Button from './Button';
 import { Task } from '@/types';
 
@@ -12,6 +12,15 @@ const TaskDetails = ({ task, close, edit }: TaskDetailsProps) => {
     const isOverDue = task.dueDate
         ? new Date(task.dueDate).toISOString().split('T')[0] < new Date().toISOString().split('T')[0]
         : false;
+
+    useEffect(() => {
+        const listener = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') close();
+        };
+        document.addEventListener('keydown', listener);
+
+        return () => document.removeEventListener('keydown', listener);
+    }, [close]);
 
     return (
         <div
