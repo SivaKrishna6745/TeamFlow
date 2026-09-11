@@ -5,7 +5,7 @@ import Filters from './Filters';
 import Button from './Button';
 import { tasksData } from '../../mockData';
 import TaskForm from './TaskForm';
-import { Filter, FormMode, SortOptions, Status, Task, User } from '@/types';
+import { Filter, FormMode, Priority, SortOptions, Status, Task, User } from '@/types';
 import TaskColumn from './TaskColumn';
 import { STATUSES } from '@/constants';
 import SearchBar from './SearchBar';
@@ -77,7 +77,14 @@ const TaskBoard = () => {
 
     const updateTask = (
         id: string,
-        changes: { title?: string; description?: string; assignee?: User; status?: Status; dueDate?: string | null },
+        changes: {
+            title?: string;
+            description?: string;
+            assignee?: User;
+            status?: Status;
+            priority?: Priority;
+            dueDate?: string | null;
+        },
     ) => {
         setTasks((prevTasks) =>
             prevTasks.map((t) =>
@@ -88,6 +95,7 @@ const TaskBoard = () => {
                           description: changes.description ?? t.description,
                           assignee: changes.assignee ?? t.assignee,
                           status: changes.status ?? t.status,
+                          priority: changes.priority ?? t.priority,
                           dueDate: changes.dueDate === null ? undefined : (changes.dueDate ?? t.dueDate),
                       }
                     : t,
@@ -220,7 +228,9 @@ const TaskBoard = () => {
                     />
                 ))}
             </div>
-            {selectedTask && <TaskDetails task={selectedTask} close={() => setSelectedTask(undefined)} />}
+            {selectedTask && (
+                <TaskDetails task={selectedTask} close={() => setSelectedTask(undefined)} edit={editTask} />
+            )}
             {toastMessage && (
                 <p className="fixed bottom-20 left-1/2 -translate-x-1/2 z-50 text-green-400 text-sm px-6 py-3 bg-green-700/40 rounded-md transition-all duration-300 animate-in fade-in slide-in-from-bottom-2">
                     {toastMessage}

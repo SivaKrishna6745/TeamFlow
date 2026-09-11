@@ -66,12 +66,18 @@ const TaskCard = ({ task, edit, del, dragStart, setSelectedTask }: TaskCardProps
                     <Button
                         label="Edit"
                         className="px-3 py-1 text-xs bg-zinc-800 text-zinc-300 font-semibold hover:bg-green-500/20 hover:text-green-400 active:scale-95 rounded-sm transition-all duration-300 border border-zinc-700/50 hover:border-green-500/30"
-                        onClick={() => edit(task.id)}
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            edit(task.id);
+                        }}
                     />
                     <Button
                         label="Delete"
                         className="px-3 py-1 text-xs bg-zinc-800 text-zinc-300 font-semibold hover:bg-red-500/20 hover:text-red-400 active:scale-95 rounded-sm transition-all duration-300 border border-zinc-700/50 hover:border-red-500/30"
-                        onClick={() => del(task.id)}
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            del(task.id);
+                        }}
                     />
                 </div>
                 {task.dueDate && (

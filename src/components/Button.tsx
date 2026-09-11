@@ -4,7 +4,7 @@ type ButtonProps = {
     type?: React.ButtonHTMLAttributes<HTMLButtonElement>['type'];
     className?: string;
     label: string;
-    onClick?: () => void;
+    onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
 };
 
 const Button = ({ type = 'button', className, label, onClick }: ButtonProps) => {

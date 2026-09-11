@@ -93,6 +93,7 @@ const TaskForm = ({ tasks, close, add, mode = 'New', editingTask = undefined, up
         setStatus('Todo');
         setError('');
         setAssignee(mockUsers[0]);
+        setPriority('Medium');
         setDueDate('');
         close();
     };
