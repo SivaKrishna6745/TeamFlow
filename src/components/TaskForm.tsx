@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { PRIORITIES, STATUSES } from '@/constants';
 import Button from './Button';
 import { FormMode, Priority, Status, Task, User } from '@/types';
@@ -76,7 +76,6 @@ const TaskForm = ({ tasks, close, add, mode = 'New', editingTask = undefined, up
     );
     const [error, setError] = useState<string>('');
 
-    const currentValues = { title, description, assign: assignee.userId, status, priority, dueDate };
     const initialValuesSnapshotRef = useRef<{
         title: string | undefined;
         description: string | undefined;
@@ -96,6 +95,11 @@ const TaskForm = ({ tasks, close, add, mode = 'New', editingTask = undefined, up
 
     const submitTask = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+
+        if (title.trim() === '') {
+            setError('Please enter the task title');
+            return;
+        }
 
         if (description.trim() === '') {
             setError('Please enter the task description');
@@ -151,11 +155,20 @@ const TaskForm = ({ tasks, close, add, mode = 'New', editingTask = undefined, up
         close();
     };
 
-    const handleClose = () => {
+    const handleClose = useCallback(() => {
+        const currentValues = { title, description, assign: assignee.userId, status, priority, dueDate };
         const isDirty = JSON.stringify(currentValues) !== JSON.stringify(initialValuesSnapshotRef.current);
         if (!isDirty) close();
         else setShowDiscardModal(true);
-    };
+    }, [assignee.userId, close, description, dueDate, priority, status, title]);
+
+    useEffect(() => {
+        const listener = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') handleClose();
+        };
+        document.addEventListener('keydown', listener);
+        return () => document.removeEventListener('keydown', listener);
+    }, [handleClose]);
 
     return (
         <form
@@ -169,11 +182,12 @@ const TaskForm = ({ tasks, close, add, mode = 'New', editingTask = undefined, up
                 <Button
                     className="text-zinc-400 hover:text-zinc-300 bg-zinc-800 hover:bg-zinc-600 rounded-full px-3 py-1 text-md"
                     label="x"
+                    aria-label="close form"
                     onClick={handleClose}
                 />
             </div>
             <div className="flex flex-col gap-2">
-                <label htmlFor="id" className="text-xs uppercase tracking-wide text-zinc-400">
+                <label htmlFor="title" className="text-xs uppercase tracking-wide text-zinc-400">
                     Title
                 </label>
                 <input
