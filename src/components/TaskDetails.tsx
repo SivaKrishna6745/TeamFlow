@@ -61,6 +61,7 @@ const TaskDetails = ({ task, close, edit, del }: TaskDetailsProps) => {
                         <span className="font-medium text-zinc-300">
                             {task.createdAt
                                 ? new Date(task.createdAt).toLocaleDateString(undefined, {
+                                      year: 'numeric',
                                       month: 'short',
                                       day: 'numeric',
                                   })
@@ -74,6 +75,7 @@ const TaskDetails = ({ task, close, edit, del }: TaskDetailsProps) => {
                         <span className="font-medium text-zinc-300">
                             {task.dueDate
                                 ? new Date(task.dueDate).toLocaleDateString(undefined, {
+                                      year: 'numeric',
                                       month: 'short',
                                       day: 'numeric',
                                   })

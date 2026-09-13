@@ -86,7 +86,11 @@ const TaskCard = ({ task, edit, del, dragStart, setSelectedTask }: TaskCardProps
                             Due Date
                         </span>
                         <span className="text-xs text-zinc-400 font-medium">
-                            {new Date(task.dueDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                            {new Date(task.dueDate).toLocaleDateString(undefined, {
+                                year: 'numeric',
+                                month: 'short',
+                                day: 'numeric',
+                            })}
                         </span>
                     </div>
                 )}
