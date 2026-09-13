@@ -57,6 +57,17 @@ const TaskDetails = ({ task, close, edit, del }: TaskDetailsProps) => {
                         )}
                     </div>
                     <div className="flex items-center gap-2 text-sm border-l-2 border-zinc-700 pl-3">
+                        <span className="font-medium text-xs uppercase tracking-wider text-zinc-500 w-20">Created</span>
+                        <span className="font-medium text-zinc-300">
+                            {task.createdAt
+                                ? new Date(task.createdAt).toLocaleDateString(undefined, {
+                                      month: 'short',
+                                      day: 'numeric',
+                                  })
+                                : ''}
+                        </span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm border-l-2 border-zinc-700 pl-3">
                         <span className="font-medium text-xs uppercase tracking-wider text-zinc-500 w-20">
                             Due date
                         </span>
