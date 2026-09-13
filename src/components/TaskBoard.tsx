@@ -241,7 +241,12 @@ const TaskBoard = () => {
                 </div>
             )}
             {selectedTask && (
-                <TaskDetails task={selectedTask} close={() => setSelectedTask(undefined)} edit={editTask} />
+                <TaskDetails
+                    task={selectedTask}
+                    close={() => setSelectedTask(undefined)}
+                    edit={editTask}
+                    del={deleteTask}
+                />
             )}
             {toastMessage && (
                 <p className="fixed bottom-20 left-1/2 -translate-x-1/2 z-50 text-green-400 text-sm px-6 py-3 bg-green-700/40 rounded-md transition-all duration-300 animate-in fade-in slide-in-from-bottom-2">

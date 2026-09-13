@@ -6,9 +6,10 @@ interface TaskDetailsProps {
     task: Task;
     close: () => void;
     edit: (id: string) => void;
+    del: (id: string) => void;
 }
 
-const TaskDetails = ({ task, close, edit }: TaskDetailsProps) => {
+const TaskDetails = ({ task, close, edit, del }: TaskDetailsProps) => {
     const isOverDue = task.dueDate
         ? new Date(task.dueDate).toISOString().split('T')[0] < new Date().toISOString().split('T')[0]
         : false;
@@ -75,6 +76,14 @@ const TaskDetails = ({ task, close, edit }: TaskDetailsProps) => {
                         className="px-5 w-max py-1.5 text-xs tracking-wide font-medium text-zinc-300 bg-green-500/40 rounded-md hover:bg-green-500/50 transition-colors duration-150"
                         onClick={() => {
                             edit(task.id);
+                            close();
+                        }}
+                    />
+                    <Button
+                        label="Delete Task"
+                        className="px-5 w-max py-1.5 text-xs tracking-wide font-medium text-zinc-300 bg-red-500/40 rounded-md hover:bg-red-500/50 transition-colors duration-150"
+                        onClick={() => {
+                            del(task.id);
                             close();
                         }}
                     />
