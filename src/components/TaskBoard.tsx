@@ -3,13 +3,13 @@
 import { useEffect, useState } from 'react';
 import Filters from './Filters';
 import Button from './Button';
-import { tasksData } from '../../mockData';
 import TaskForm from './TaskForm';
 import { Filter, FormMode, Priority, SortOptions, Status, Task, User } from '@/types';
 import TaskColumn from './TaskColumn';
 import { STATUSES } from '@/constants';
 import SearchBar from './SearchBar';
 import TaskDetails from './TaskDetails';
+import { getTasks } from '@/lib/api';
 
 const DelConfirmationPopup = ({ onConfirm, onCancel }: { onConfirm: () => void; onCancel: () => void }) => {
     return (
@@ -42,7 +42,7 @@ const DelConfirmationPopup = ({ onConfirm, onCancel }: { onConfirm: () => void; 
 
 const TaskBoard = () => {
     const [isFormOpen, setIsFormOpen] = useState<boolean>(false);
-    const [tasks, setTasks] = useState<Task[]>(tasksData);
+    const [tasks, setTasks] = useState<Task[]>([]);
     const [formMode, setFormMode] = useState<FormMode>('New');
     const [editingTask, setEditingTask] = useState<Task | undefined>(undefined);
     const [confirmDel, setConfirmDel] = useState<string | undefined>(undefined);
@@ -52,6 +52,14 @@ const TaskBoard = () => {
     const [sortOption, setSortOption] = useState<SortOptions>('newest');
     const [search, setSearch] = useState<string>('');
     const [selectedTask, setSelectedTask] = useState<Task | undefined>(undefined);
+
+    useEffect(() => {
+        async function loadTasks() {
+            const data = await getTasks();
+            setTasks(data);
+        }
+        loadTasks();
+    }, []);
 
     const currentUserId = 'USR-1';
 
