@@ -53,13 +53,27 @@ const TaskBoard = () => {
     const [search, setSearch] = useState<string>('');
     const [selectedTask, setSelectedTask] = useState<Task | undefined>(undefined);
 
+    const [loading, setLoading] = useState<boolean>(true);
+    const [error, setError] = useState<string>('');
+    const [retryCount, setRetryCount] = useState<number>(0);
+
     useEffect(() => {
-        async function loadTasks() {
-            const data = await getTasks();
-            setTasks(data);
-        }
+        const loadTasks = async () => {
+            setLoading(true);
+            setError('');
+
+            try {
+                const data = await getTasks();
+                setTasks(data);
+            } catch (error) {
+                setError(error instanceof Error ? error.message : 'Failed while fetching data');
+            } finally {
+                setLoading(false);
+            }
+        };
+
         loadTasks();
-    }, []);
+    }, [retryCount]);
 
     const currentUserId = 'USR-1';
 
@@ -221,33 +235,58 @@ const TaskBoard = () => {
                 </div>
             </div>
             <SearchBar value={search} onChange={(e) => setSearch(e.target.value)} />
-            {tasks.length === 0 ? (
-                <div className="flex flex-col gap-1 items-center justify-center py-16 text-center border border-zinc-800/60 rounded-xl bg-zinc-900/30">
-                    <p className="font-medium text-zinc-400">No tasks yet</p>
-                    <p className="mt-1 text-sm text-zinc-500">Create a task to get started.</p>
-                    <Button
-                        label={'+ New Task'}
-                        className="mt-6 px-5 py-2 rounded-sm bg-blue-600/50 hover:bg-blue-500/60 active:scale-98 transition-all duration-200"
-                        onClick={openForm}
-                    />
-                </div>
-            ) : (
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    {STATUSES.map((status) => (
-                        <TaskColumn
-                            key={status}
-                            status={status}
-                            tasks={sortedTasks.filter((t) => t.status === status)}
-                            editTask={editTask}
-                            deleteTask={deleteTask}
-                            dragStart={handleDragStart}
-                            dragOver={handleDragOver}
-                            drop={handleDrop}
-                            setSelectedTask={handleSelectedTask}
+            <div>
+                {loading ? (
+                    <div className="font-medium text-blue-500 text-center border border-blue-800/60 rounded-xl py-16 flex flex-col gap-3 items-center">
+                        <div className="h-8 w-8 rounded-full border-4 border-zinc-700 border-t-blue-500 animate-spin"></div>
+                        <span>Loading tasks... please wait!!</span>
+                    </div>
+                ) : error ? (
+                    <div className="font-medium text-red-500 text-center border border-red-800/60 rounded-xl py-16 flex flex-col gap-3 items-center">
+                        <svg
+                            className="w-8 h-8 text-red-500/80"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                            strokeWidth={2}
+                        >
+                            <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                            />
+                        </svg>
+                        <span>{error}</span>
+                        <button onClick={() => setRetryCount((prev) => prev + 1)}>Retry</button>
+                    </div>
+                ) : tasks.length === 0 ? (
+                    <div className="flex flex-col gap-1 items-center justify-center py-16 text-center border border-zinc-800/60 rounded-xl bg-zinc-900/30">
+                        <p className="font-medium text-zinc-400">No tasks yet</p>
+                        <p className="mt-1 text-sm text-zinc-500">Create a task to get started.</p>
+                        <Button
+                            label={'+ New Task'}
+                            className="mt-6 px-5 py-2 rounded-sm bg-blue-600/50 hover:bg-blue-500/60 active:scale-98 transition-all duration-200"
+                            onClick={openForm}
                         />
-                    ))}
-                </div>
-            )}
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        {STATUSES.map((status) => (
+                            <TaskColumn
+                                key={status}
+                                status={status}
+                                tasks={sortedTasks.filter((t) => t.status === status)}
+                                editTask={editTask}
+                                deleteTask={deleteTask}
+                                dragStart={handleDragStart}
+                                dragOver={handleDragOver}
+                                drop={handleDrop}
+                                setSelectedTask={handleSelectedTask}
+                            />
+                        ))}
+                    </div>
+                )}
+            </div>
             {selectedTask && (
                 <TaskDetails
                     task={selectedTask}
