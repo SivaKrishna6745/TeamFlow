@@ -76,6 +76,7 @@ const TaskForm = ({ tasks, close, add, mode = 'New', editingTask = undefined, up
         editMode && editingTask?.dueDate ? (new Date(editingTask?.dueDate).toISOString().split('T')[0] ?? '') : '',
     );
     const [error, setError] = useState<string>('');
+    const [submitError, setSubmitError] = useState<string>('askcnj');
 
     const initialValuesSnapshotRef = useRef<{
         title: string | undefined;
@@ -148,7 +149,7 @@ const TaskForm = ({ tasks, close, add, mode = 'New', editingTask = undefined, up
                 add(task);
             } catch (err) {
                 console.error(err);
-                throw err;
+                setSubmitError(err instanceof Error ? err.message : 'Failed to create task');
             }
         }
 
@@ -302,6 +303,11 @@ const TaskForm = ({ tasks, close, add, mode = 'New', editingTask = undefined, up
                 className="px-5 py-2 bg-green-600/70 hover:bg-green-400/70 text-zinc-200 font-semibold tracking-wider active:scale-98 rounded-sm transition-all duration-300"
             />
             {showDiscardModal && <DiscardChangesModal closeModal={() => setShowDiscardModal(false)} close={close} />}
+            {submitError && (
+                <div className="text-center text-red-400 text-xs tracking-wider border border-red-600/80 bg-red-800/20 py-2 rounded-md">
+                    {submitError}
+                </div>
+            )}
         </form>
     );
 };
