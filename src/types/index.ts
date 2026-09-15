@@ -23,3 +23,12 @@ export interface Task {
     assignee: User;
     dueDate?: string;
 }
+
+export interface CreateTaskInput {
+    title: string;
+    description: string;
+    status: Status;
+    priority: Priority;
+    assignee: User;
+    dueDate?: string;
+}

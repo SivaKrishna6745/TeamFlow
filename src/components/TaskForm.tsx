@@ -5,6 +5,7 @@ import { PRIORITIES, STATUSES } from '@/constants';
 import Button from './Button';
 import { FormMode, Priority, Status, Task, User } from '@/types';
 import { mockUsers } from '../../mockData';
+import { createTask } from '@/lib/api';
 
 interface TaskFormProps {
     tasks: Task[];
@@ -93,7 +94,7 @@ const TaskForm = ({ tasks, close, add, mode = 'New', editingTask = undefined, up
     });
     const [showDiscardModal, setShowDiscardModal] = useState<boolean>(false);
 
-    const submitTask = (e: React.FormEvent<HTMLFormElement>) => {
+    const submitTask = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
         if (title.trim() === '') {
@@ -128,12 +129,10 @@ const TaskForm = ({ tasks, close, add, mode = 'New', editingTask = undefined, up
         }
 
         const newTask = {
-            id: crypto.randomUUID(),
             title,
             description,
             status,
             priority,
-            createdAt: new Date().toISOString(),
             assignee: {
                 userId: assignee.userId,
                 name: assignee.name,
@@ -143,7 +142,15 @@ const TaskForm = ({ tasks, close, add, mode = 'New', editingTask = undefined, up
 
         if (editMode && editingTask)
             update?.(editingTask.id, { title, description, assignee, status, priority, dueDate });
-        else add(newTask);
+        else {
+            try {
+                const task = await createTask(newTask);
+                add(task);
+            } catch (err) {
+                console.error(err);
+                throw err;
+            }
+        }
 
         setTitle('');
         setDescription('');
