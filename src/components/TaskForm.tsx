@@ -13,6 +13,7 @@ interface TaskFormProps {
     add: (task: Task) => void;
     mode?: FormMode;
     editingTask: Task | undefined;
+    update?: (task: Task) => void;
 }
 
 const FORM_FIELD_CLASSNAME =
@@ -53,7 +54,7 @@ const DiscardChangesModal = ({ closeModal, close }: { closeModal: () => void; cl
     );
 };
 
-const TaskForm = ({ tasks, close, add, mode = 'New', editingTask = undefined }: TaskFormProps) => {
+const TaskForm = ({ tasks, close, add, mode = 'New', editingTask = undefined, update }: TaskFormProps) => {
     const editMode = mode === 'Edit';
 
     const [title, setTitle] = useState<string>(editMode ? (editingTask?.title ?? '') : '');
@@ -65,7 +66,7 @@ const TaskForm = ({ tasks, close, add, mode = 'New', editingTask = undefined }: 
         editMode && editingTask?.dueDate ? (new Date(editingTask?.dueDate).toISOString().split('T')[0] ?? '') : '',
     );
     const [error, setError] = useState<string>('');
-    const [submitError, setSubmitError] = useState<string>('askcnj');
+    const [submitError, setSubmitError] = useState<string>('');
 
     const initialValuesSnapshotRef = useRef<{
         title: string | undefined;
@@ -131,7 +132,20 @@ const TaskForm = ({ tasks, close, add, mode = 'New', editingTask = undefined }: 
         };
 
         if (editMode && editingTask) {
-            editTask(editingTask?.id, { title, description, assignee, status, priority, dueDate });
+            try {
+                const updatedTask = await editTask(editingTask?.id, {
+                    title,
+                    description,
+                    assignee,
+                    status,
+                    priority,
+                    dueDate,
+                });
+                update?.(updatedTask);
+            } catch (err) {
+                console.error(err);
+                setSubmitError(err instanceof Error ? err.message : 'Failed to update task');
+            }
         } else {
             try {
                 const task = await createTask(newTask);
@@ -146,6 +160,7 @@ const TaskForm = ({ tasks, close, add, mode = 'New', editingTask = undefined }: 
         setDescription('');
         setStatus('Todo');
         setError('');
+        setSubmitError('');
         setAssignee(mockUsers[0]);
         setPriority('Medium');
         setDueDate('');

@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import Filters from './Filters';
 import Button from './Button';
 import TaskForm from './TaskForm';
-import { Filter, FormMode, Priority, SortOptions, Status, Task, User } from '@/types';
+import { Filter, FormMode, SortOptions, Status, Task } from '@/types';
 import TaskColumn from './TaskColumn';
 import { STATUSES } from '@/constants';
 import SearchBar from './SearchBar';
@@ -97,32 +97,8 @@ const TaskBoard = () => {
         setEditingTask(task);
     };
 
-    const updateTask = (
-        id: string,
-        changes: {
-            title?: string;
-            description?: string;
-            assignee?: User;
-            status?: Status;
-            priority?: Priority;
-            dueDate?: string | null;
-        },
-    ) => {
-        setTasks((prevTasks) =>
-            prevTasks.map((t) =>
-                t.id === id
-                    ? {
-                          ...t,
-                          title: changes.title ?? t.title,
-                          description: changes.description ?? t.description,
-                          assignee: changes.assignee ?? t.assignee,
-                          status: changes.status ?? t.status,
-                          priority: changes.priority ?? t.priority,
-                          dueDate: changes.dueDate === null ? undefined : (changes.dueDate ?? t.dueDate),
-                      }
-                    : t,
-            ),
-        );
+    const updateTask = (task: Task) => {
+        setTasks((prevTasks) => prevTasks.map((t) => (t.id === task.id ? task : t)));
         setEditingTask(undefined);
         setFormMode('New');
     };
