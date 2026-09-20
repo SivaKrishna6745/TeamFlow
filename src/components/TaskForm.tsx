@@ -5,7 +5,7 @@ import { PRIORITIES, STATUSES } from '@/constants';
 import Button from './Button';
 import { FormMode, Priority, Status, Task, User } from '@/types';
 import { mockUsers } from '../../mockData';
-import { createTask } from '@/lib/api';
+import { createTask, editTask } from '@/lib/api';
 
 interface TaskFormProps {
     tasks: Task[];
@@ -13,17 +13,6 @@ interface TaskFormProps {
     add: (task: Task) => void;
     mode?: FormMode;
     editingTask: Task | undefined;
-    update?: (
-        id: string,
-        changes: {
-            title?: string;
-            description?: string;
-            assignee?: User;
-            status?: Status;
-            priority?: Priority;
-            dueDate?: string;
-        },
-    ) => void;
 }
 
 const FORM_FIELD_CLASSNAME =
@@ -64,7 +53,7 @@ const DiscardChangesModal = ({ closeModal, close }: { closeModal: () => void; cl
     );
 };
 
-const TaskForm = ({ tasks, close, add, mode = 'New', editingTask = undefined, update }: TaskFormProps) => {
+const TaskForm = ({ tasks, close, add, mode = 'New', editingTask = undefined }: TaskFormProps) => {
     const editMode = mode === 'Edit';
 
     const [title, setTitle] = useState<string>(editMode ? (editingTask?.title ?? '') : '');
@@ -141,9 +130,9 @@ const TaskForm = ({ tasks, close, add, mode = 'New', editingTask = undefined, up
             dueDate: dueDate ? new Date(dueDate).toISOString() : undefined,
         };
 
-        if (editMode && editingTask)
-            update?.(editingTask.id, { title, description, assignee, status, priority, dueDate });
-        else {
+        if (editMode && editingTask) {
+            editTask(editingTask?.id, { title, description, assignee, status, priority, dueDate });
+        } else {
             try {
                 const task = await createTask(newTask);
                 add(task);

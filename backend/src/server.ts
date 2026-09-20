@@ -26,6 +26,23 @@ app.post('/api/tasks', (req: Request, res: Response) => {
     res.status(201).json({ data: newTask });
 });
 
+app.put('/api/tasks/:id', (req: Request, res: Response) => {
+    const id = req.params.id;
+    console.log(id);
+    const taskToUpdateIndex = tasksData.findIndex((task) => task.id === id);
+    const taskToUpdate = tasksData.find((task) => task.id === id);
+    if (!taskToUpdate) {
+        return res.status(404).json({ message: 'Task not found' });
+    }
+
+    const updatedTask = {
+        ...req.body,
+        ...taskToUpdate,
+    };
+    tasksData.splice(taskToUpdateIndex, 1, updatedTask);
+    res.status(200).json({ data: updatedTask });
+});
+
 app.get('/', (req: Request, res: Response) => {
     res.send('<h1>Server</h1>');
 });

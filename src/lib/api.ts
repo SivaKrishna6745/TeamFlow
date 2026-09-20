@@ -33,3 +33,22 @@ export async function createTask(taskData: CreateTaskInput): Promise<Task> {
         throw err;
     }
 }
+
+export async function editTask(id: string | undefined, taskUpdates: Partial<Task>): Promise<Task> {
+    try {
+        const response = await fetch(`${BASE_API_URI}/tasks/${id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(taskUpdates),
+        });
+        if (!response.ok) throw new Error('Error while fetching the task');
+
+        const result = await response.json();
+        return result.data;
+    } catch (err) {
+        console.error(err);
+        throw err;
+    }
+}
