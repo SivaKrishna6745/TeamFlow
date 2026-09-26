@@ -49,6 +49,18 @@ app.put('/api/tasks/:id', (req: Request, res: Response) => {
     res.status(200).json({ data: updatedTask });
 });
 
+app.delete('/api/tasks/:id', (req: Request, res: Response) => {
+    const id = req.params.id;
+    const taskToDeleteIndex = tasksData.findIndex((t) => t.id === id);
+    const taskToDelete = tasksData.find((t) => t.id === id);
+    if (!taskToDelete) {
+        return res.status(404).json({ message: 'Task not found' });
+    }
+
+    tasksData.splice(taskToDeleteIndex, 1);
+    res.status(200).json({ data: taskToDelete });
+});
+
 app.get('/', (req: Request, res: Response) => {
     res.send('<h1>Server</h1>');
 });

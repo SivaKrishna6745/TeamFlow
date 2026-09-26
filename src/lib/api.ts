@@ -52,3 +52,21 @@ export async function editTask(id: string | undefined, taskUpdates: Partial<Task
         throw err;
     }
 }
+
+export async function deleteATask(id: string | undefined): Promise<Task> {
+    try {
+        const response = await fetch(`${BASE_API_URI}/tasks/${id}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+        if (!response.ok) throw new Error('Error while deleting the task');
+
+        const result = await response.json();
+        return result.data;
+    } catch (err) {
+        console.error(err);
+        throw err;
+    }
+}

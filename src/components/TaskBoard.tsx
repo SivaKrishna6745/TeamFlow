@@ -9,7 +9,7 @@ import TaskColumn from './TaskColumn';
 import { STATUSES } from '@/constants';
 import SearchBar from './SearchBar';
 import TaskDetails from './TaskDetails';
-import { getTasks } from '@/lib/api';
+import { deleteATask, getTasks } from '@/lib/api';
 
 const DelConfirmationPopup = ({ onConfirm, onCancel }: { onConfirm: () => void; onCancel: () => void }) => {
     return (
@@ -107,6 +107,16 @@ const TaskBoard = () => {
         setConfirmDel(id);
     };
 
+    const confirmDeletion = async () => {
+        try {
+            const task = await deleteATask(confirmDel);
+            setTasks((prevTasks) => prevTasks.filter((t) => t.id !== task.id));
+            setConfirmDel(undefined);
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
     const handleDragStart = (id: string) => {
         setDraggingId(id);
     };
@@ -187,13 +197,7 @@ const TaskBoard = () => {
                 </div>
             )}
             {confirmDel && (
-                <DelConfirmationPopup
-                    onConfirm={() => {
-                        setTasks((prevTasks) => prevTasks.filter((t) => t.id !== confirmDel));
-                        setConfirmDel(undefined);
-                    }}
-                    onCancel={() => setConfirmDel(undefined)}
-                />
+                <DelConfirmationPopup onConfirm={confirmDeletion} onCancel={() => setConfirmDel(undefined)} />
             )}
             <div className="flex justify-between">
                 <div className="flex items-center gap-8 text-sm bg-zinc-900/60 px-4 py-2 rounded-md border border-zinc-800">
