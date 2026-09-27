@@ -2,71 +2,71 @@ import { CreateTaskInput, Task } from '@/types';
 
 const BASE_API_URI: string = 'http://localhost:8080/api';
 
-export async function getTasks(): Promise<Task[]> {
-    try {
-        const response = await fetch(`${BASE_API_URI}/tasks`);
-        if (!response.ok) throw new Error('Failed while fetching the data');
+type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE';
 
-        const tasksData = await response.json();
-        return tasksData.data;
-    } catch (err) {
-        console.error(err);
-        throw err;
+interface ApiResponse<T> {
+    data: T;
+}
+
+interface RequestOptions {
+    method: HttpMethod;
+    headers?: {
+        'Content-Type': string;
+    };
+    body?: string;
+}
+
+const fetchHelper = async <T>(URI: string, options: RequestOptions, responseError: string): Promise<T> => {
+    let requestOptions: RequestOptions = {
+        method: options.method,
+    };
+    if (options.body) {
+        requestOptions = {
+            ...requestOptions,
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: options.body,
+        };
     }
+
+    const response = await fetch(URI, requestOptions);
+    if (!response.ok) throw new Error(responseError);
+
+    const result: ApiResponse<T> = await response.json();
+    return result.data;
+};
+
+export async function getTasks(): Promise<Task[]> {
+    const options: RequestOptions = {
+        method: 'GET',
+    };
+
+    return fetchHelper<Task[]>(`${BASE_API_URI}/tasks`, options, 'Failed while fetching the data');
 }
 
 export async function createTask(taskData: CreateTaskInput): Promise<Task> {
-    try {
-        const response = await fetch(`${BASE_API_URI}/tasks`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(taskData),
-        });
-        if (!response.ok) throw new Error('Failed while creating a task');
+    const options: RequestOptions = {
+        method: 'POST',
+        body: JSON.stringify(taskData),
+    };
 
-        const result = await response.json();
-        return result.data;
-    } catch (err) {
-        console.error(err);
-        throw err;
-    }
+    return fetchHelper<Task>(`${BASE_API_URI}/tasks`, options, 'Failed while creating a task');
 }
 
 export async function editTask(id: string | undefined, taskUpdates: Partial<Task>): Promise<Task> {
-    try {
-        const response = await fetch(`${BASE_API_URI}/tasks/${id}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(taskUpdates),
-        });
-        if (!response.ok) throw new Error('Error while fetching the task');
+    const options: RequestOptions = {
+        method: 'PUT',
+        body: JSON.stringify(taskUpdates),
+    };
 
-        const result = await response.json();
-        return result.data;
-    } catch (err) {
-        console.error(err);
-        throw err;
-    }
+    return fetchHelper<Task>(`${BASE_API_URI}/tasks/${id}`, options, 'Error while fetching the task');
 }
 
 export async function deleteATask(id: string | undefined): Promise<Task> {
-    try {
-        const response = await fetch(`${BASE_API_URI}/tasks/${id}`, {
-            method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        });
-        if (!response.ok) throw new Error('Error while deleting the task');
+    const options: RequestOptions = {
+        method: 'DELETE',
+    };
 
-        const result = await response.json();
-        return result.data;
-    } catch (err) {
-        console.error(err);
-        throw err;
-    }
+    return fetchHelper<Task>(`${BASE_API_URI}/tasks/${id}`, options, 'Error while deleting the task');
 }
