@@ -48,6 +48,7 @@ const TaskBoard = () => {
     const [confirmDel, setConfirmDel] = useState<string | undefined>(undefined);
     const [draggingId, setDraggingId] = useState<string | undefined>(undefined);
     const [toastMessage, setToastMessage] = useState<string | undefined>(undefined);
+    const [deleteToast, setDeleteToast] = useState<string | undefined>(undefined);
     const [filter, setFilter] = useState<Filter>('All');
     const [sortOption, setSortOption] = useState<SortOptions>('newest');
     const [search, setSearch] = useState<string>('');
@@ -114,6 +115,7 @@ const TaskBoard = () => {
             setConfirmDel(undefined);
         } catch (err) {
             console.error(err);
+            setDeleteToast(err instanceof Error ? err.message : 'Failed to delete task');
         }
     };
 
@@ -142,6 +144,16 @@ const TaskBoard = () => {
 
         return () => clearTimeout(timer);
     }, [toastMessage]);
+
+    useEffect(() => {
+        if (!deleteToast) return;
+
+        const timer = setTimeout(() => {
+            setDeleteToast(undefined);
+        }, 2000);
+
+        return () => clearTimeout(timer);
+    }, [deleteToast]);
 
     const selectFilter = (filter: Filter) => {
         setFilter(filter);
@@ -278,6 +290,11 @@ const TaskBoard = () => {
             {toastMessage && (
                 <p className="fixed bottom-20 left-1/2 -translate-x-1/2 z-50 text-green-400 text-sm px-6 py-3 bg-green-700/40 rounded-md transition-all duration-300 animate-in fade-in slide-in-from-bottom-2">
                     {toastMessage}
+                </p>
+            )}
+            {deleteToast && (
+                <p className="fixed bottom-20 left-1/2 -translate-x-1/2 z-50 text-red-400 text-sm px-6 py-3 bg-red-700/40 rounded-md transition-all duration-300 animate-in fade-in slide-in-from-bottom-2">
+                    {deleteToast}
                 </p>
             )}
         </div>
