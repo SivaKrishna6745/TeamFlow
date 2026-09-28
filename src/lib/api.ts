@@ -17,18 +17,17 @@ interface RequestOptions {
 }
 
 const fetchHelper = async <T>(URI: string, options: RequestOptions, responseError: string): Promise<T> => {
-    let requestOptions: RequestOptions = {
-        method: options.method,
-    };
-    if (options.body) {
-        requestOptions = {
-            ...requestOptions,
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: options.body,
-        };
-    }
+    const requestOptions: RequestOptions = options.body
+        ? {
+              method: options.method,
+              headers: {
+                  'Content-Type': 'application/json',
+              },
+              body: options.body,
+          }
+        : {
+              method: options.method,
+          };
 
     const response = await fetch(URI, requestOptions);
     if (!response.ok) throw new Error(responseError);
