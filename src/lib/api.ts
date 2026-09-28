@@ -41,7 +41,7 @@ export async function getTasks(): Promise<Task[]> {
         method: 'GET',
     };
 
-    return fetchHelper<Task[]>(`${BASE_API_URI}/tasks`, options, 'Failed while fetching the data');
+    return fetchHelper<Task[]>(`${BASE_API_URI}/tasks`, options, 'Failed while fetching tasks');
 }
 
 export async function createTask(taskData: CreateTaskInput): Promise<Task> {
@@ -59,7 +59,7 @@ export async function editTask(id: string | undefined, taskUpdates: Partial<Task
         body: JSON.stringify(taskUpdates),
     };
 
-    return fetchHelper<Task>(`${BASE_API_URI}/tasks/${id}`, options, 'Error while fetching the task');
+    return fetchHelper<Task>(`${BASE_API_URI}/tasks/${id}`, options, 'Failed while updating the task');
 }
 
 export async function deleteATask(id: string | undefined): Promise<Task> {
@@ -67,5 +67,5 @@ export async function deleteATask(id: string | undefined): Promise<Task> {
         method: 'DELETE',
     };
 
-    return fetchHelper<Task>(`${BASE_API_URI}/tasks/${id}`, options, 'Error while deleting the task');
+    return fetchHelper<Task>(`${BASE_API_URI}/tasks/${id}`, options, 'Failed while deleting the task');
 }
