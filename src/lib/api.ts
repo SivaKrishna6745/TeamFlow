@@ -1,6 +1,6 @@
 import { CreateTaskInput, Task } from '@/types';
 
-const BASE_API_URI: string = 'http://localhost:8080/api';
+const BASE_API_URI = 'http://localhost:8080/api';
 
 type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE';
 
