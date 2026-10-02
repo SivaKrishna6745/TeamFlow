@@ -1,6 +1,7 @@
 import express, { type Express, type Request, type Response } from 'express';
 import cors from 'cors';
 import { tasksData } from './mockData';
+import { validateTask } from './utils/validateTask';
 
 const PORT: number = 8080;
 const app: Express = express();
@@ -15,6 +16,10 @@ app.get('/api/tasks', (req: Request, res: Response) => {
 });
 
 app.post('/api/tasks', (req: Request, res: Response) => {
+    const validationError = validateTask(req.body);
+    if (validationError) {
+        return res.status(400).json({ message: validationError });
+    }
     const id = crypto.randomUUID();
     const createdAt = new Date().toISOString();
     const newTask = {
