@@ -59,14 +59,20 @@ const TaskBoard = () => {
     const [retryCount, setRetryCount] = useState<number>(0);
 
     useEffect(() => {
+        const controller = new AbortController();
+        const signal = controller.signal;
+
         const loadTasks = async () => {
             setLoading(true);
             setError('');
 
             try {
-                const data = await getTasks();
+                const data = await getTasks(signal);
                 setTasks(data);
             } catch (error) {
+                if (error instanceof Error && error.name === 'AbortError') {
+                    return;
+                }
                 setError(error instanceof Error ? error.message : 'Failed while fetching data');
             } finally {
                 setLoading(false);
@@ -74,6 +80,8 @@ const TaskBoard = () => {
         };
 
         loadTasks();
+
+        return () => controller.abort();
     }, [retryCount]);
 
     const currentUserId = 'USR-1';

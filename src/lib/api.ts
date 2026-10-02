@@ -14,6 +14,7 @@ interface RequestOptions {
         'Content-Type': string;
     };
     body?: string;
+    signal?: AbortSignal;
 }
 
 const fetchHelper = async <T>(URI: string, options: RequestOptions, responseError: string): Promise<T> => {
@@ -24,9 +25,11 @@ const fetchHelper = async <T>(URI: string, options: RequestOptions, responseErro
                   'Content-Type': 'application/json',
               },
               body: options.body,
+              signal: options.signal,
           }
         : {
               method: options.method,
+              signal: options.signal,
           };
 
     const response = await fetch(URI, requestOptions);
@@ -36,9 +39,10 @@ const fetchHelper = async <T>(URI: string, options: RequestOptions, responseErro
     return result.data;
 };
 
-export async function getTasks(): Promise<Task[]> {
+export async function getTasks(signal: AbortSignal): Promise<Task[]> {
     const options: RequestOptions = {
         method: 'GET',
+        signal,
     };
 
     return fetchHelper<Task[]>(`${BASE_API_URI}/tasks`, options, 'Failed while fetching tasks');
