@@ -1,4 +1,5 @@
 import { CreateTaskInput, Task } from '@/types';
+import { ApiError } from './ApiError';
 
 const BASE_API_URI = 'http://localhost:8080/api';
 
@@ -32,7 +33,7 @@ const fetchHelper = async <T>(URI: string, options: RequestOptions, responseErro
     const response = await fetch(URI, requestOptions);
     if (!response.ok) {
         const res = await response.json();
-        throw new Error(res.message ? `${responseError}: ${res.message}` : responseError);
+        throw new ApiError(res.message ? `${responseError}: ${res.message}` : responseError, response.status);
     }
 
     const result: ApiResponse<T> = await response.json();
