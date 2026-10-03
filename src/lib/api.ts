@@ -30,7 +30,10 @@ const fetchHelper = async <T>(URI: string, options: RequestOptions, responseErro
     };
 
     const response = await fetch(URI, requestOptions);
-    if (!response.ok) throw new Error(responseError);
+    if (!response.ok) {
+        const res = await response.json();
+        throw new Error(res.message ? `${responseError}: ${res.message}` : responseError);
+    }
 
     const result: ApiResponse<T> = await response.json();
     return result.data;
