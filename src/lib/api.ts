@@ -58,7 +58,7 @@ export async function createTask(taskData: CreateTaskInput): Promise<Task> {
     return fetchHelper<Task>(`${BASE_API_URI}/tasks`, options, 'Failed while creating a task');
 }
 
-export async function editTask(id: string | undefined, taskUpdates: Partial<Task>): Promise<Task> {
+export async function editATask(id: string | undefined, taskUpdates: Partial<Task>): Promise<Task> {
     const options: RequestOptions = {
         method: 'PUT',
         body: JSON.stringify(taskUpdates),

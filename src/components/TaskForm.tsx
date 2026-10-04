@@ -5,7 +5,7 @@ import { PRIORITIES, STATUSES } from '@/constants';
 import Button from './Button';
 import { FormMode, Priority, Status, Task, User } from '@/types';
 import { mockUsers } from '../../mockData';
-import { createTask, editTask } from '@/lib/api';
+import { createTask, editATask } from '@/lib/api';
 
 interface TaskFormProps {
     tasks: Task[];
@@ -133,7 +133,7 @@ const TaskForm = ({ tasks, close, add, mode = 'New', editingTask = undefined, up
 
         if (editMode && editingTask) {
             try {
-                const updatedTask = await editTask(editingTask?.id, {
+                const updatedTask = await editATask(editingTask?.id, {
                     title,
                     description,
                     assignee,
