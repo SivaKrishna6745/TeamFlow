@@ -5,3 +5,5 @@ export const FORM_MODES = ['New', 'Edit'] as const;
 export const SORT_OPTIONS = ['newest', 'oldest'] as const;
 
 export const PRIORITIES = ['Low', 'Medium', 'High'] as const;
+
+export const TOAST_TYPES = ['Success', 'Failure'] as const;

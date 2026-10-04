@@ -43,12 +43,12 @@ app.put('/api/tasks/:id', (req: Request, res: Response) => {
 
     const updatedTask = {
         ...taskToUpdate,
-        title,
-        description,
-        status,
-        priority,
-        assignee,
-        dueDate,
+        title: title ?? taskToUpdate.title,
+        description: description ?? taskToUpdate.description,
+        status: status ?? taskToUpdate.status,
+        priority: priority ?? taskToUpdate.priority,
+        assignee: assignee ?? taskToUpdate.assignee,
+        dueDate: dueDate === null ? null : (dueDate ?? taskToUpdate.dueDate),
     };
     tasksData.splice(taskToUpdateIndex, 1, updatedTask);
     res.status(200).json({ data: updatedTask });

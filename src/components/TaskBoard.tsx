@@ -4,12 +4,12 @@ import { useEffect, useState } from 'react';
 import Filters from './Filters';
 import Button from './Button';
 import TaskForm from './TaskForm';
-import { Filter, FormMode, SortOptions, Status, Task } from '@/types';
+import { Filter, FormMode, SortOptions, Status, Task, ToastType } from '@/types';
 import TaskColumn from './TaskColumn';
 import { STATUSES } from '@/constants';
 import SearchBar from './SearchBar';
 import TaskDetails from './TaskDetails';
-import { deleteATask, getTasks } from '@/lib/api';
+import { deleteATask, editATask, getTasks } from '@/lib/api';
 
 const DelConfirmationPopup = ({ onConfirm, onCancel }: { onConfirm: () => void; onCancel: () => void }) => {
     return (
@@ -48,7 +48,10 @@ const TaskBoard = () => {
     const [confirmDel, setConfirmDel] = useState<string | undefined>(undefined);
     const [draggingId, setDraggingId] = useState<string | undefined>(undefined);
     const [movedTaskId, setMovedTaskId] = useState<string | undefined>(undefined);
-    const [toastMessage, setToastMessage] = useState<string | undefined>(undefined);
+    const [toastMessage, setToastMessage] = useState<{ message: string; type: ToastType } | undefined>({
+        message: '',
+        type: 'Success',
+    });
     const [deleteToast, setDeleteToast] = useState<string | undefined>(undefined);
     const [filter, setFilter] = useState<Filter>('All');
     const [sortOption, setSortOption] = useState<SortOptions>('newest');
@@ -136,13 +139,24 @@ const TaskBoard = () => {
         e.preventDefault();
     };
 
-    const handleDrop = (status: Status) => {
+    const handleDrop = async (status: Status) => {
         if (!draggingId) return;
 
+        const previousStatus = tasks.find((t) => t.id === draggingId)?.status;
         setTasks((prevTasks) => prevTasks.map((t) => (t.id === draggingId ? { ...t, status: status } : t)));
         setDraggingId(undefined);
         setMovedTaskId(draggingId);
-        if (tasks.find((t) => t.id === draggingId)?.status !== status) setToastMessage(`Task moved to ${status}`);
+
+        try {
+            await editATask(draggingId, { status });
+            if (previousStatus !== status) setToastMessage({ message: `Task moved to ${status}`, type: 'Success' });
+        } catch (err) {
+            console.error(err);
+            setTasks((prevTasks) =>
+                prevTasks.map((t) => (t.id === draggingId ? { ...t, status: previousStatus! } : t)),
+            );
+            setToastMessage({ message: 'Failed to move task. Changes reverted.', type: 'Failure' });
+        }
     };
 
     useEffect(() => {
@@ -309,8 +323,10 @@ const TaskBoard = () => {
                 />
             )}
             {toastMessage && (
-                <p className="fixed bottom-20 left-1/2 -translate-x-1/2 z-50 text-green-400 text-sm px-6 py-3 bg-green-700/40 rounded-md transition-all duration-300 animate-in fade-in slide-in-from-bottom-2">
-                    {toastMessage}
+                <p
+                    className={`fixed bottom-20 left-1/2 -translate-x-1/2 z-50  text-sm px-6 py-3  rounded-md transition-all duration-300 animate-in fade-in slide-in-from-bottom-2 ${toastMessage.type === 'Success' ? 'text-green-400 bg-green-700/40' : 'text-red-400 bg-red-700/40'}`}
+                >
+                    {toastMessage.message}
                 </p>
             )}
             {deleteToast && (
