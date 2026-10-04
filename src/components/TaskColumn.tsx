@@ -11,6 +11,7 @@ type TaskColumnProps = {
     dragOver: (e: React.DragEvent<HTMLDivElement>) => void;
     drop: (colStatus: Status) => void;
     setSelectedTask: (Task: Task) => void;
+    movedTaskId: string | undefined;
 };
 
 const TaskColumn = ({
@@ -22,6 +23,7 @@ const TaskColumn = ({
     dragOver,
     drop,
     setSelectedTask,
+    movedTaskId,
 }: TaskColumnProps) => {
     const [isDragOver, setIsDragOver] = useState<boolean>(false);
 
@@ -55,6 +57,7 @@ const TaskColumn = ({
                         del={deleteTask}
                         dragStart={dragStart}
                         setSelectedTask={setSelectedTask}
+                        isMoved={movedTaskId === task.id}
                     />
                 ))
             )}

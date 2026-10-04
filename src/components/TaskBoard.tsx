@@ -47,6 +47,7 @@ const TaskBoard = () => {
     const [editingTask, setEditingTask] = useState<Task | undefined>(undefined);
     const [confirmDel, setConfirmDel] = useState<string | undefined>(undefined);
     const [draggingId, setDraggingId] = useState<string | undefined>(undefined);
+    const [movedTaskId, setMovedTaskId] = useState<string | undefined>(undefined);
     const [toastMessage, setToastMessage] = useState<string | undefined>(undefined);
     const [deleteToast, setDeleteToast] = useState<string | undefined>(undefined);
     const [filter, setFilter] = useState<Filter>('All');
@@ -140,6 +141,7 @@ const TaskBoard = () => {
 
         setTasks((prevTasks) => prevTasks.map((t) => (t.id === draggingId ? { ...t, status: status } : t)));
         setDraggingId(undefined);
+        setMovedTaskId(draggingId);
         if (tasks.find((t) => t.id === draggingId)?.status !== status) setToastMessage(`Task moved to ${status}`);
     };
 
@@ -152,6 +154,16 @@ const TaskBoard = () => {
 
         return () => clearTimeout(timer);
     }, [toastMessage]);
+
+    useEffect(() => {
+        if (!movedTaskId) return;
+
+        const timer = setTimeout(() => {
+            setMovedTaskId(undefined);
+        }, 600);
+
+        return () => clearTimeout(timer);
+    }, [movedTaskId]);
 
     useEffect(() => {
         if (!deleteToast) return;
@@ -282,6 +294,7 @@ const TaskBoard = () => {
                                 dragOver={handleDragOver}
                                 drop={handleDrop}
                                 setSelectedTask={handleSelectedTask}
+                                movedTaskId={movedTaskId}
                             />
                         ))}
                     </div>
