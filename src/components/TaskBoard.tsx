@@ -1,7 +1,8 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import Filters from './Filters';
+import Filters, { FILTERS } from './Filters';
 import Button from './Button';
 import TaskForm from './TaskForm';
 import { Filter, FormMode, SortOptions, Status, Task, ToastType } from '@/types';
@@ -10,6 +11,21 @@ import { STATUSES } from '@/constants';
 import SearchBar from './SearchBar';
 import TaskDetails from './TaskDetails';
 import { deleteATask, editATask, getTasks } from '@/lib/api';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+
+const useDebounce = (input: string) => {
+    const [debouncedInput, setDebouncedInput] = useState<string>(input);
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setDebouncedInput(input);
+        }, 500);
+
+        return () => clearTimeout(timer);
+    }, [input]);
+
+    return debouncedInput;
+};
 
 const DelConfirmationPopup = ({ onConfirm, onCancel }: { onConfirm: () => void; onCancel: () => void }) => {
     return (
@@ -41,6 +57,14 @@ const DelConfirmationPopup = ({ onConfirm, onCancel }: { onConfirm: () => void; 
 };
 
 const TaskBoard = () => {
+    const router = useRouter();
+    const pathname = usePathname();
+    const params = useSearchParams();
+    const currentQuery = params.toString();
+    const rawfilter = params.get('filter') ?? 'All';
+    const filter: Filter = rawfilter && FILTERS.includes(rawfilter as Filter) ? (rawfilter as Filter) : 'All';
+    const search = params.get('search') ?? '';
+
     const [isFormOpen, setIsFormOpen] = useState<boolean>(false);
     const [tasks, setTasks] = useState<Task[]>([]);
     const [formMode, setFormMode] = useState<FormMode>('New');
@@ -53,14 +77,20 @@ const TaskBoard = () => {
         type: 'Success',
     });
     const [deleteToast, setDeleteToast] = useState<string | undefined>(undefined);
-    const [filter, setFilter] = useState<Filter>('All');
+    // const [filter, setFilter] = useState<Filter>(params.get('filter') as Filter?? 'All');
     const [sortOption, setSortOption] = useState<SortOptions>('newest');
-    const [search, setSearch] = useState<string>('');
+    const [searchInput, setSearchInput] = useState<string>('');
     const [selectedTask, setSelectedTask] = useState<Task | undefined>(undefined);
 
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string>('');
     const [retryCount, setRetryCount] = useState<number>(0);
+
+    const debouncedInput = useDebounce(searchInput);
+
+    useEffect(() => {
+        setSearchInput(search);
+    }, [search]);
 
     const versionRef = useRef<Record<string, number>>({});
 
@@ -194,8 +224,38 @@ const TaskBoard = () => {
         return () => clearTimeout(timer);
     }, [deleteToast]);
 
+    useEffect(() => {
+        const updatedParams = new URLSearchParams(params.toString());
+        if (debouncedInput === '') {
+            updatedParams.delete('search');
+        } else {
+            updatedParams.set('search', debouncedInput);
+        }
+
+        const query = updatedParams.toString();
+
+        if (query !== currentQuery) {
+            router.replace(query ? `${pathname}?${query}` : pathname, {
+                scroll: false,
+            });
+        }
+    }, [currentQuery, debouncedInput, params, pathname, router]);
+
     const selectFilter = (filter: Filter) => {
-        setFilter(filter);
+        const updatedParams = new URLSearchParams(params.toString());
+        if (updatedParams.get('filter') === 'All') {
+            updatedParams.delete('filter');
+        } else {
+            updatedParams.set('filter', filter);
+        }
+
+        const query = updatedParams.toString();
+
+        if (query !== currentQuery) {
+            router.push(query ? `${pathname}?${query}` : pathname, {
+                scroll: false,
+            });
+        }
     };
 
     const derivedTasks =
@@ -265,7 +325,7 @@ const TaskBoard = () => {
                     <span className="w-16 capitalize">{sortOption}</span>
                 </div>
             </div>
-            <SearchBar value={search} onChange={(e) => setSearch(e.target.value)} />
+            <SearchBar value={searchInput} onChange={(e) => setSearchInput(e.target.value)} />
             <div>
                 {loading ? (
                     <div className="font-medium text-blue-500 text-center border border-blue-800/60 rounded-xl py-16 flex flex-col gap-3 items-center">
