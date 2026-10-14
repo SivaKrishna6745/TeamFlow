@@ -7,11 +7,30 @@ import Button from './Button';
 import TaskForm from './TaskForm';
 import { Filter, FormMode, SortOptions, Status, Task, ToastType } from '@/types';
 import TaskColumn from './TaskColumn';
-import { STATUSES } from '@/constants';
+import { SORT_OPTIONS, STATUSES } from '@/constants';
 import SearchBar from './SearchBar';
 import TaskDetails from './TaskDetails';
 import { deleteATask, editATask, getTasks } from '@/lib/api';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+
+const PRIORITY_RANKS = {
+    High: 3,
+    Medium: 2,
+    Low: 1,
+};
+
+const getSortComparator = (sortOption: SortOptions): ((a: Task, b: Task) => number) => {
+    switch (sortOption) {
+        case 'newest first':
+            return (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+        case 'oldest first':
+            return (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+        case 'priority high':
+            return (a, b) => PRIORITY_RANKS[b.priority] - PRIORITY_RANKS[a.priority];
+        case 'priority low':
+            return (a, b) => PRIORITY_RANKS[a.priority] - PRIORITY_RANKS[b.priority];
+    }
+};
 
 const useDebounce = (input: string) => {
     const [debouncedInput, setDebouncedInput] = useState<string>(input);
@@ -78,7 +97,7 @@ const TaskBoard = () => {
     });
     const [deleteToast, setDeleteToast] = useState<string | undefined>(undefined);
     // const [filter, setFilter] = useState<Filter>(params.get('filter') as Filter?? 'All');
-    const [sortOption, setSortOption] = useState<SortOptions>('newest');
+    const [sortOption, setSortOption] = useState<SortOptions>('newest first');
     const [searchInput, setSearchInput] = useState<string>('');
     const [selectedTask, setSelectedTask] = useState<Task | undefined>(undefined);
 
@@ -265,10 +284,6 @@ const TaskBoard = () => {
               ? tasks.filter((t) => t.assignee.userId === currentUserId)
               : tasks.filter((t) => t.status === filter);
 
-    const handleSort = () => {
-        setSortOption((prev: SortOptions) => (prev === 'newest' ? 'oldest' : 'newest'));
-    };
-
     const searchedTasks =
         search.trim() === ''
             ? derivedTasks
@@ -278,10 +293,7 @@ const TaskBoard = () => {
                       task.description.toLowerCase().includes(search.toLowerCase()),
               );
 
-    const sortedTasks =
-        sortOption === 'newest'
-            ? [...searchedTasks].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-            : [...searchedTasks].sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+    const sortedTasks = [...searchedTasks].sort(getSortComparator(sortOption));
 
     const handleSelectedTask = (task: Task) => setSelectedTask(task);
 
@@ -316,13 +328,32 @@ const TaskBoard = () => {
                     <div className="h-4 w-px bg-zinc-800" />
                     <Filters selectedFilter={filter} select={selectFilter} />
                 </div>
-                <div className="flex items-center gap-8 text-sm bg-zinc-900/60 px-4 py-2 rounded-md border border-zinc-800">
-                    <Button
-                        label="Sort"
-                        className="px-3 py-1 rounded-sm bg-mauve-800 hover:bg-mauve-700/80 active:scale-98 transition-all duration-200"
-                        onClick={handleSort}
-                    />
-                    <span className="w-16 capitalize">{sortOption}</span>
+                <div className="flex items-center gap-4">
+                    <label htmlFor="task-sort" className="text-sm text-zinc-400">
+                        Sort by
+                    </label>
+
+                    <select
+                        id="task-sort"
+                        value={sortOption}
+                        onChange={(e) => setSortOption(e.target.value as SortOptions)}
+                        className="rounded-md border border-mauve-600 bg-mauve-800 px-4 py-3 text-sm
+                                text-white transition-colors hover:bg-mauve-700
+                                focus-visible:outline-none"
+                    >
+                        {SORT_OPTIONS.map((option) => (
+                            <option key={option} value={option}>
+                                {
+                                    {
+                                        'newest first': 'Newest first',
+                                        'oldest first': 'Oldest first',
+                                        'priority high': 'Priority: High → Low',
+                                        'priority low': 'Priority: Low → High',
+                                    }[option]
+                                }
+                            </option>
+                        ))}
+                    </select>
                 </div>
             </div>
             <SearchBar value={searchInput} onChange={(e) => setSearchInput(e.target.value)} />
