@@ -18,7 +18,7 @@ const SearchBar = ({ value, onChange }: SearchBarProps) => {
                 placeholder="Search for a task..."
                 value={value}
                 onChange={onChange}
-                className="border border-zinc-500 rounded-full px-3 py-1 focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-400 min-w-md placeholder:text-sm placeholder:tracking-wider"
+                className="border border-zinc-500 sm:w-80 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-400 min-w-md placeholder:text-sm placeholder:tracking-wider transition-colors"
             />
         </div>
     );
