@@ -302,6 +302,15 @@ const TaskBoard = () => {
 
     const handleSelectedTask = (task: Task) => setSelectedTask(task);
 
+    const copyTaskId = async (id: string) => {
+        try {
+            await navigator.clipboard.writeText(id);
+            setToast({ message: 'Copied Task Id', type: 'Success' });
+        } catch {
+            setToast({ message: 'Failed to copy Task Id', type: 'Failure' });
+        }
+    };
+
     return (
         <div className="relative flex flex-col gap-8 px-10">
             <div className="flex justify-between items-center border-b border-zinc-800 pb-8">
@@ -426,6 +435,7 @@ const TaskBoard = () => {
                     task={selectedTask}
                     close={() => setSelectedTask(undefined)}
                     edit={editTask}
+                    copy={copyTaskId}
                     del={deleteTask}
                 />
             )}

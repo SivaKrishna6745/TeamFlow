@@ -1,15 +1,17 @@
 import React, { useEffect } from 'react';
 import Button from './Button';
 import { Task } from '@/types';
+import { Copy } from 'lucide-react';
 
 interface TaskDetailsProps {
     task: Task;
     close: () => void;
     edit: (id: string) => void;
+    copy: (id: string) => void;
     del: (id: string) => void;
 }
 
-const TaskDetails = ({ task, close, edit, del }: TaskDetailsProps) => {
+const TaskDetails = ({ task, close, edit, copy, del }: TaskDetailsProps) => {
     const isOverDue = task.dueDate
         ? new Date(task.dueDate).toISOString().split('T')[0] < new Date().toISOString().split('T')[0]
         : false;
@@ -36,7 +38,10 @@ const TaskDetails = ({ task, close, edit, del }: TaskDetailsProps) => {
                     Task Overview
                 </p>
 
-                <h2 className="text-xl font-bold text-zinc-100 border-b border-zinc-600 pb-4">{task?.title}</h2>
+                <h2 className="text-xl font-bold text-zinc-100 border-b border-zinc-600 pb-4 flex items-center justify-between">
+                    <span>{task?.title}</span>
+                    <Copy className="cursor-pointer" onClick={() => copy(task.id)} />
+                </h2>
                 <p className="text-sm text-zinc-400 leading-relaxed bg-zinc-950/30 p-3 rounded-lg border border-zinc-800/50">
                     {task.description}
                 </p>
