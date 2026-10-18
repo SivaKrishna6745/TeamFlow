@@ -2,6 +2,7 @@ import React from 'react';
 import { Task } from '@/types';
 import Button from './Button';
 import { CalendarDays } from 'lucide-react';
+import Avatar from './Avatar';
 
 type TaskCardProps = {
     task: Task;
@@ -63,16 +64,14 @@ const TaskCard = ({ task, edit, del, dragStart, setSelectedTask, isMoved }: Task
             onDragStart={() => dragStart(task.id)}
             onClick={() => setSelectedTask(task)}
         >
-            <div className="w-full flex justify-between">
-                <div className="flex flex-col gap-4">
+            <div className="w-full flex flex-col xl:flex-row gap-4 xl:gap-8">
+                <div className="flex flex-col gap-4 flex-1 min-w-0">
+                    <div className="text-sm text-gray-400">{dayCreated}</div>
                     <p className="text-lg font-semibold tracking-wide text-zinc-100 wrap-break-word">{task.title}</p>
-                    <p
-                        id="descption"
-                        className="text-base text-zinc-300 leading-relaxed wrap-break-word w-64 line-clamp-2"
-                    >
+                    <p id="descption" className="text-base text-zinc-300 leading-relaxed wrap-break-word line-clamp-2">
                         {task.description}
                     </p>
-                    <div className="flex gap-4">
+                    <div className="flex gap-2 xl:gap-4">
                         {isOverDue && (
                             <span className="inline-flex items-center gap-1 rounded-full bg-red-500/10 px-2 py-0.5 text-xs font-bold uppercase tracking-wider text-red-400/80 border border-red-400">
                                 ⚠️ Overdue
@@ -85,34 +84,30 @@ const TaskCard = ({ task, edit, del, dragStart, setSelectedTask, isMoved }: Task
                         </span>
                     </div>
                 </div>
-                <div className="flex flex-col gap-6">
-                    <div className="text-sm text-gray-400 flex items-center justify-center gap-1 self-end">
-                        {dayCreated}
-                    </div>
-                    <div className="flex gap-4 opacity-90 sm:opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                        <Button
-                            label="Edit"
-                            className="px-3 py-1 text-xs bg-zinc-800 text-zinc-300 font-semibold hover:bg-green-500/20 hover:text-green-400 active:scale-95 rounded-sm transition-all duration-300 border border-zinc-700/50 hover:border-green-500/30"
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                edit(task.id);
-                            }}
-                        />
-                        <Button
-                            label="Delete"
-                            className="px-3 py-1 text-xs bg-zinc-800 text-zinc-300 font-semibold hover:bg-red-500/20 hover:text-red-400 active:scale-95 rounded-sm transition-all duration-300 border border-zinc-700/50 hover:border-red-500/30"
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                del(task.id);
-                            }}
-                        />
-                    </div>
+                <div className="flex items-center gap-4 opacity-90 xl:opacity-0 group-hover:opacity-100 transition-opacity duration-200 shrink-0">
+                    <Button
+                        label="Edit"
+                        className="px-3 py-1 text-xs bg-zinc-800 text-zinc-300 font-semibold hover:bg-green-500/20 hover:text-green-400 active:scale-95 rounded-sm transition-all duration-300 border border-zinc-700/50 hover:border-green-500/30"
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            edit(task.id);
+                        }}
+                    />
+                    <Button
+                        label="Delete"
+                        className="px-3 py-1 text-xs bg-zinc-800 text-zinc-300 font-semibold hover:bg-red-500/20 hover:text-red-400 active:scale-95 rounded-sm transition-all duration-300 border border-zinc-700/50 hover:border-red-500/30"
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            del(task.id);
+                        }}
+                    />
                 </div>
             </div>
             <div className="h-px w-full bg-zinc-600 my-6"></div>
             <div className="w-full flex items-center justify-between">
-                <p className="text-zinc-500">
-                    <span className="font-semibold text-zinc-300">{task.assignee.name}</span>
+                <p className="flex items-center gap-1">
+                    <Avatar assignee={task.assignee} />
+                    <span className="font-semibold text-zinc-300 hidden lg:block">{task.assignee.name}</span>
                 </p>
                 {task.dueDate && (
                     <div className="text-right mt-auto flex items-center justify-center gap-1">
